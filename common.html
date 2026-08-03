@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKKM团队 - 常见密码学工具</title>
+    <style>
+        :root {
+            --bg: #f5f5f5;
+            --panel-bg: #ffffff;
+            --text: #333333;
+            --text-secondary: #666666;
+            --border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.04);
+            --btn-primary: #4f46e5;
+            --btn-primary-hover: #4338ca;
+            --card-hover: #f8f8f8;
+            --accent-glow: rgba(79,70,229,0.1);
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a; --panel-bg: #1e293b; --text: #f1f5f9; --text-secondary: #94a3b8;
+            --border: #334155; --shadow: 0 4px 24px rgba(0,0,0,0.3); --btn-primary: #6366f1;
+            --btn-primary-hover: #818cf8; --card-hover: rgba(99,102,241,0.12); --accent-glow: rgba(99,102,241,0.2);
+        }
+        [data-theme="forest"] {
+            --bg: #ecfdf5; --panel-bg: #ffffff; --text: #064e3b; --text-secondary: #059669;
+            --border: #a7f3d0; --shadow: 0 4px 24px rgba(6,78,59,0.08); --btn-primary: #059669;
+            --btn-primary-hover: #047857; --card-hover: rgba(5,150,105,0.08); --accent-glow: rgba(5,150,105,0.15);
+        }
+        [data-theme="ocean"] {
+            --bg: #eff6ff; --panel-bg: #ffffff; --text: #1e3a5f; --text-secondary: #0ea5e9;
+            --border: #bfdbfe; --shadow: 0 4px 24px rgba(30,58,95,0.08); --btn-primary: #3b82f6;
+            --btn-primary-hover: #2563eb; --card-hover: rgba(59,130,246,0.08); --accent-glow: rgba(59,130,246,0.15);
+        }
+        [data-theme="sunset"] {
+            --bg: #fff7ed; --panel-bg: #ffffff; --text: #7c2d12; --text-secondary: #f97316;
+            --border: #fed7aa; --shadow: 0 4px 24px rgba(124,45,18,0.08); --btn-primary: #f97316;
+            --btn-primary-hover: #ea580c; --card-hover: rgba(249,115,22,0.08); --accent-glow: rgba(249,115,22,0.15);
+        }
+        [data-theme="lavender"] {
+            --bg: #faf5ff; --panel-bg: #ffffff; --text: #4c1d95; --text-secondary: #8b5cf6;
+            --border: #e9d5ff; --shadow: 0 4px 24px rgba(76,29,149,0.08); --btn-primary: #8b5cf6;
+            --btn-primary-hover: #7c3aed; --card-hover: rgba(139,92,246,0.08); --accent-glow: rgba(139,92,246,0.15);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter','Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:var(--bg); min-height:100vh; transition:background 0.35s; }
+        .app-header { background:var(--panel-bg); box-shadow:var(--shadow); padding:20px 24px; position:sticky; top:0; z-index:100; transition:background 0.35s; }
+        .header-content { max-width:1400px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+        .logo-section { display:flex; align-items:center; gap:12px; cursor:pointer; }
+        .logo-icon { width:48px; height:48px; background:linear-gradient(135deg,#4f46e5,#7c3aed); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 6px 20px rgba(79,70,229,0.3); }
+        .logo-text h1 { font-size:1.5rem; font-weight:700; color:var(--text); transition:color 0.35s; }
+        .logo-text p { font-size:0.82rem; color:var(--text-secondary); transition:color 0.35s; }
+        .header-right { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+        .search-box { position:relative; display:flex; align-items:center; }
+        .search-box input { padding:10px 14px 10px 40px; border:2px solid var(--border); border-radius:12px; font-size:0.9rem; width:280px; background:var(--bg); color:var(--text); outline:none; transition:all 0.2s; }
+        .search-box input:focus { border-color:var(--btn-primary); box-shadow:0 0 0 3px var(--accent-glow); }
+        .search-box::before { content:'🔍'; position:absolute; left:12px; font-size:1rem; }
+        .theme-switcher { display:flex; gap:4px; background:var(--bg); padding:4px; border-radius:12px; border:1px solid var(--border); }
+        .theme-btn { width:28px; height:28px; border-radius:8px; border:2px solid transparent; cursor:pointer; transition:all 0.2s; }
+        .theme-btn:hover { transform:scale(1.12); }
+        .theme-btn.active { border-color:var(--btn-primary); box-shadow:0 0 0 3px var(--accent-glow); }
+        .main-content { max-width:1400px; margin:0 auto; padding:24px; }
+        .hero-section { background:linear-gradient(135deg,#4f46e5,#7c3aed); border-radius:12px; padding:24px 32px; margin-bottom:24px; color:white; }
+        .hero-content h2 { font-size:1.5rem; font-weight:700; margin-bottom:8px; }
+        .hero-content p { font-size:0.95rem; opacity:0.9; max-width:600px; }
+        .tools-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+        .tool-card { background:var(--panel-bg); border-radius:12px; padding:20px; box-shadow:var(--shadow); cursor:pointer; transition:all 0.2s; border:1px solid var(--border); }
+        .tool-card:hover { background:var(--card-hover); transform:translateY(-2px); }
+        .tool-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:12px; background:#4f46e5; }
+        .tool-card h3 { font-size:1.15rem; font-weight:700; color:var(--text); margin-bottom:8px; }
+        .tool-card p { font-size:0.88rem; color:var(--text-secondary); line-height:1.5; margin-bottom:16px; }
+        .tool-tags { display:flex; gap:6px; flex-wrap:wrap; }
+        .tool-tag { padding:4px 10px; background:var(--bg); border-radius:16px; font-size:0.75rem; font-weight:600; color:var(--text-secondary); }
+        .footer { background:var(--panel-bg); border-top:1px solid var(--border); padding:24px; margin-top:40px; }
+        .footer-content { max-width:1400px; margin:0 auto; text-align:center; color:var(--text-secondary); font-size:0.88rem; }
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000; visibility:hidden; opacity:0; transition:all 0.3s; }
+        .modal-overlay.active { visibility:visible; opacity:1; }
+        .modal-dialog { background:var(--panel-bg); border-radius:12px; padding:28px; box-shadow:var(--shadow); width:95%; max-width:1200px; max-height:95vh; overflow-y:auto; }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .modal-header h3 { font-size:1.3rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:10px; }
+        .close-btn { width:36px; height:36px; border-radius:50%; border:none; background:var(--bg); color:var(--text); font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .close-btn:hover { background:var(--border); }
+        .tool-panel { display:none; }
+        .tool-panel.active { display:block; }
+        .input-group { margin-bottom:16px; }
+        .input-group label { display:block; font-size:0.88rem; font-weight:600; color:var(--text); margin-bottom:8px; }
+        .input-group input, .input-group textarea, .input-group select { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:12px; font-size:0.95rem; background:var(--bg); color:var(--text); outline:none; }
+        .input-group input:focus, .input-group textarea:focus { border-color:var(--btn-primary); box-shadow:0 0 0 3px var(--accent-glow); }
+        .input-group textarea { resize:vertical; min-height:100px; }
+        .btn { padding:12px 24px; border:none; border-radius:12px; font-size:0.95rem; font-weight:600; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:8px; }
+        .btn-primary { background:var(--btn-primary); color:white; }
+        .btn-primary:hover { background:var(--btn-primary-hover); transform:translateY(-1px); }
+        .btn-group { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+        .btn-group .btn { flex:1; min-width:120px; }
+        .result-box { background:var(--bg); border-radius:12px; padding:16px; margin-top:16px; border:2px solid var(--border); }
+        .result-box h4 { font-size:0.9rem; font-weight:600; color:var(--text-secondary); margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
+        .result-box textarea { width:100%; min-height:80px; border:none; background:transparent; color:var(--text); font-family:monospace; font-size:1rem; resize:vertical; outline:none; }
+        .copy-btn { background:var(--btn-primary); color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; }
+        .copy-btn:hover { background:var(--btn-primary-hover); }
+        .back-link { display:inline-flex; align-items:center; gap:8px; color:white; text-decoration:none; font-weight:600; }
+        .back-link:hover { text-decoration:underline; }
+        @media (max-width:768px) {
+            .header-content { flex-direction:column; align-items:stretch; }
+            .search-box input { width:100%; }
+            .tools-grid { grid-template-columns:1fr; }
+        }
+        .paste-area { border:2px dashed var(--border); border-radius:12px; padding:24px; text-align:center; cursor:pointer; color:var(--text-secondary); transition:all 0.2s; min-height:80px; display:flex; align-items:center; justify-content:center; }
+        .paste-area:focus { border-color:var(--btn-primary); box-shadow:0 0 0 3px var(--accent-glow); outline:none; }
+        .frequency-chart { display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+        .freq-row { display:flex; align-items:center; gap:8px; font-size:0.8rem; }
+        .freq-letter { width:30px; font-weight:600; color:var(--text); }
+        .freq-bar { height:14px; background:linear-gradient(90deg, var(--btn-primary), var(--btn-primary-hover)); border-radius:4px; transition:width 0.3s; }
+        .freq-count { width:40px; text-align:right; color:var(--text-secondary); }
+        .periodic-table { display:flex; flex-direction:column; gap:3px; overflow-x:auto; padding-bottom:8px; }
+        .pt-row { display:grid; grid-template-columns:repeat(18,1fr); gap:3px; }
+        .pt-cell { aspect-ratio:1; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; padding:3px; min-width:56px; background:var(--panel-bg); border:1px solid var(--border); }
+        .pt-cell:hover { transform:scale(1.1); z-index:10; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+        .pt-cell.pt-empty { background:transparent; border:none; cursor:default; }
+        .pt-cell.pt-empty:hover { transform:none; box-shadow:none; }
+        .pt-cell.pt-active { outline:2px solid var(--btn-primary); outline-offset:2px; }
+        .pt-cell.pt-hidden { visibility:hidden; }
+        .pt-num { font-size:0.65rem; color:var(--text-secondary); line-height:1; }
+        .pt-sym { font-size:1.1rem; font-weight:700; color:var(--text); line-height:1.2; }
+        .pt-name { font-size:0.6rem; color:var(--text-secondary); line-height:1; }
+        .pt-cell.pt-placeholder .pt-num { font-size:0.6rem; }
+        .pt-cell.pt-placeholder .pt-sym { font-size:0.8rem; }
+        .pt-cell.pt-label { cursor:default; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:0.8rem; font-weight:600; color:var(--text-secondary); background:transparent; border:none; }
+        .pt-cell.pt-label:hover { transform:none; box-shadow:none; }
+        .pt-gap { height:16px; }
+        .pt-cell.cat-alkali { background:#ff6b6b; color:#fff; }
+        .pt-cell.cat-alkali .pt-sym, .pt-cell.cat-alkali .pt-num, .pt-cell.cat-alkali .pt-name { color:#fff; }
+        .pt-cell.cat-alkaline { background:#ffa94d; color:#fff; }
+        .pt-cell.cat-alkaline .pt-sym, .pt-cell.cat-alkaline .pt-num, .pt-cell.cat-alkaline .pt-name { color:#fff; }
+        .pt-cell.cat-transition { background:#ffd43b; }
+        .pt-cell.cat-post { background:#74c0fc; }
+        .pt-cell.cat-metalloid { background:#69db7c; }
+        .pt-cell.cat-nonmetal { background:#63e6be; }
+        .pt-cell.cat-halogen { background:#9775fa; color:#fff; }
+        .pt-cell.cat-halogen .pt-sym, .pt-cell.cat-halogen .pt-num, .pt-cell.cat-halogen .pt-name { color:#fff; }
+        .pt-cell.cat-noble { background:#da77f2; color:#fff; }
+        .pt-cell.cat-noble .pt-sym, .pt-cell.cat-noble .pt-num, .pt-cell.cat-noble .pt-name { color:#fff; }
+        .pt-cell.cat-lanthanide { background:#faa2c1; }
+        .pt-cell.cat-actinide { background:#f783ac; }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo-section" onclick="location.href='index.html'">
+                <div class="logo-icon">🔐</div>
+                <div class="logo-text"><h1>常见密码学工具</h1><p>AKKM团队 - 经典密码工具箱</p></div>
+            </div>
+            <div class="header-right">
+                <div class="search-box"><input type="text" id="searchInput" placeholder="搜索工具..." /></div>
+                <div class="theme-switcher" id="themeSwitcher">
+                    <button class="theme-btn active" data-theme="light" style="background:linear-gradient(135deg,#f0f2f5,#ffffff);" title="经典浅色"></button>
+                    <button class="theme-btn" data-theme="dark" style="background:linear-gradient(135deg,#0f172a,#1e293b);" title="暗夜模式"></button>
+                    <button class="theme-btn" data-theme="forest" style="background:linear-gradient(135deg,#ecfdf5,#a7f3d0);" title="森林绿"></button>
+                    <button class="theme-btn" data-theme="ocean" style="background:linear-gradient(135deg,#eff6ff,#bfdbfe);" title="海洋蓝"></button>
+                    <button class="theme-btn" data-theme="sunset" style="background:linear-gradient(135deg,#fff7ed,#fed7aa);" title="暖阳橙"></button>
+                    <button class="theme-btn" data-theme="lavender" style="background:linear-gradient(135deg,#faf5ff,#e9d5ff);" title="薰衣草紫"></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="hero-section">
+            <div class="hero-content">
+                <a href="index.html" class="back-link">← 返回主页面</a>
+                <h2 style="margin-top:16px;">经典密码学工具</h2>
+                <p>包含最常用的密码加密、解密和编码工具，适合日常使用和学习密码学。</p>
+            </div>
+        </div>
+
+        <div class="tools-grid" id="toolsGrid">
+            <div class="tool-card" data-modal="caesar"><div class="tool-icon">🔐</div><h3>凯撒密码</h3><p>经典的替换密码工具，支持任意位移量的加密和解密。</p><div class="tool-tags"><span class="tool-tag">加密</span><span class="tool-tag">解密</span><span class="tool-tag">替换</span></div></div>
+            <div class="tool-card" data-modal="vigenere"><div class="tool-icon">🔑</div><h3>维吉尼亚密码</h3><p>多表替换密码，使用密钥进行加密解密。</p><div class="tool-tags"><span class="tool-tag">加密</span><span class="tool-tag">解密</span><span class="tool-tag">多表</span></div></div>
+            <div class="tool-card" data-modal="rot"><div class="tool-icon">🔄</div><h3>ROT系列</h3><p>ROT13及任意ROT位移工具，快速进行字母循环替换。</p><div class="tool-tags"><span class="tool-tag">ROT13</span><span class="tool-tag">替换</span><span class="tool-tag">编码</span></div></div>
+            <div class="tool-card" data-modal="morse"><div class="tool-icon">📡</div><h3>摩尔斯电码</h3><p>国际摩尔斯电码转换器，支持文本和电码双向转换。</p><div class="tool-tags"><span class="tool-tag">编码</span><span class="tool-tag">解码</span><span class="tool-tag">电报</span></div></div>
+            <div class="tool-card" data-modal="atbash"><div class="tool-icon">🔁</div><h3>Atbash密码</h3><p>简单的替换密码，字母表首尾对应替换。</p><div class="tool-tags"><span class="tool-tag">替换</span><span class="tool-tag">加密</span><span class="tool-tag">解密</span></div></div>
+            <div class="tool-card" data-modal="reverse"><div class="tool-icon">↩️</div><h3>文本反转</h3><p>将文本按字符或单词进行反转。</p><div class="tool-tags"><span class="tool-tag">反转</span><span class="tool-tag">文本</span><span class="tool-tag">处理</span></div></div>
+            <div class="tool-card" data-modal="base64"><div class="tool-icon">📦</div><h3>Base64编解码</h3><p>标准Base64编码解码工具，支持URL安全模式。</p><div class="tool-tags"><span class="tool-tag">编码</span><span class="tool-tag">解码</span><span class="tool-tag">数据</span></div></div>
+            <div class="tool-card" data-modal="railfence"><div class="tool-icon">🔒</div><h3>栅栏密码</h3><p>将明文按行排列再按列读取的加密方式。</p><div class="tool-tags"><span class="tool-tag">加密</span><span class="tool-tag">解密</span><span class="tool-tag">栅栏</span></div></div>
+            <div class="tool-card" data-modal="bacon"><div class="tool-icon">📝</div><h3>培根密码</h3><p>使用A/B两种字符组合进行编码的密码。</p><div class="tool-tags"><span class="tool-tag">编码</span><span class="tool-tag">解码</span><span class="tool-tag">培根</span></div></div>
+            <div class="tool-card" data-modal="nato"><div class="tool-icon">🔊</div><h3>NATO音标</h3><p>北约音标字母对照表，用于无线电通信。</p><div class="tool-tags"><span class="tool-tag">音标</span><span class="tool-tag">军事</span><span class="tool-tag">通信</span></div></div>
+            <div class="tool-card" data-modal="braille"><div class="tool-icon">👁️</div><h3>盲文转换器</h3><p>文本与盲文之间的转换工具。</p><div class="tool-tags"><span class="tool-tag">盲文</span><span class="tool-tag">转换</span><span class="tool-tag">无障碍</span></div></div>
+            <div class="tool-card" data-modal="polybius"><div class="tool-icon">🔢</div><h3>波利比乌斯棋盘</h3><p>基于5x5方格的替换密码，每个字母对应坐标。</p><div class="tool-tags"><span class="tool-tag">棋盘</span><span class="tool-tag">加密</span><span class="tool-tag">解密</span></div></div>
+            <div class="tool-card" data-modal="affine"><div class="tool-icon">📐</div><h3>仿射密码</h3><p>基于线性变换的替换密码，使用数学公式加密。</p><div class="tool-tags"><span class="tool-tag">线性</span><span class="tool-tag">加密</span><span class="tool-tag">解密</span></div></div>
+            <div class="tool-card" data-modal="substitution"><div class="tool-icon">🔤</div><h3>替换密码分析</h3><p>单表替换密码的频率分析工具，帮助破解简单替换密码。</p><div class="tool-tags"><span class="tool-tag">频率分析</span><span class="tool-tag">破解</span><span class="tool-tag">统计</span></div></div>
+            <div class="tool-card" data-modal="pixel"><div class="tool-icon">🖼️</div><h3>像素分析</h3><p>图片像素颜色提取和分析工具，帮助识别隐藏信息。</p><div class="tool-tags"><span class="tool-tag">像素</span><span class="tool-tag">颜色</span><span class="tool-tag">分析</span></div></div>
+            <div class="tool-card" data-modal="stego"><div class="tool-icon">🎭</div><h3>隐写术检测</h3><p>检测图片中可能隐藏的信息，支持多种隐写方式。</p><div class="tool-tags"><span class="tool-tag">隐写</span><span class="tool-tag">检测</span><span class="tool-tag">隐藏</span></div></div>
+            <div class="tool-card" data-modal="sudoku"><div class="tool-icon">🧮</div><h3>数独求解器</h3><p>自动求解数独谜题，支持各种难度级别。</p><div class="tool-tags"><span class="tool-tag">数独</span><span class="tool-tag">求解</span><span class="tool-tag">逻辑</span></div></div>
+            <div class="tool-card" data-modal="qrcode"><div class="tool-icon">🔍</div><h3>二维码生成</h3><p>将文本转换为二维码图片。</p><div class="tool-tags"><span class="tool-tag">二维码</span><span class="tool-tag">生成</span><span class="tool-tag">编码</span></div></div>
+            <div class="tool-card" data-modal="puzzle"><div class="tool-icon">🧩</div><h3>拼图求解器</h3><p>分析和解决拼图类谜题。</p><div class="tool-tags"><span class="tool-tag">拼图</span><span class="tool-tag">求解</span><span class="tool-tag">逻辑</span></div></div>
+            <div class="tool-card" data-modal="coordinate"><div class="tool-icon">📍</div><h3>坐标转换器</h3><p>经纬度与UTM坐标之间的转换工具。</p><div class="tool-tags"><span class="tool-tag">坐标</span><span class="tool-tag">转换</span><span class="tool-tag">GPS</span></div></div>
+            <div class="tool-card" data-modal="baseconvert"><div class="tool-icon">🔢</div><h3>进制转换</h3><p>支持2-36进制之间的任意转换。</p><div class="tool-tags"><span class="tool-tag">进制</span><span class="tool-tag">转换</span><span class="tool-tag">数字</span></div></div>
+            <div class="tool-card" data-modal="basecalc"><div class="tool-icon">🧮</div><h3>进制计算器</h3><p>不同进制的四则运算和逻辑运算。</p><div class="tool-tags"><span class="tool-tag">进制</span><span class="tool-tag">运算</span><span class="tool-tag">逻辑</span></div></div>
+            <div class="tool-card" data-modal="collatz"><div class="tool-icon">🌧️</div><h3>冰雹猜想</h3><p>考拉兹猜想(3n+1)序列计算器，可视化数字轨迹。</p><div class="tool-tags"><span class="tool-tag">猜想</span><span class="tool-tag">序列</span><span class="tool-tag">3n+1</span></div></div>
+            <div class="tool-card" data-modal="semaphore"><div class="tool-icon">🚩</div><h3>旗语转换器</h3><p>国际信号旗语字母对照表，用于海上通信。</p><div class="tool-tags"><span class="tool-tag">旗语</span><span class="tool-tag">通信</span><span class="tool-tag">海上</span></div></div>
+            <div class="tool-card" data-modal="periodic"><div class="tool-icon">⚗️</div><h3>元素周期表</h3><p>化学元素周期表查询工具，支持搜索和元素详情查看。</p><div class="tool-tags"><span class="tool-tag">化学</span><span class="tool-tag">元素</span><span class="tool-tag">周期表</span></div></div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 id="modalTitle">工具</h3>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modalContent">
+                <div class="tool-panel" id="panel-caesar">
+                    <div class="input-group"><label>输入文本</label><textarea id="caesarInput" placeholder="输入要加密/解密的文本..."></textarea></div>
+                    <div class="input-group"><label>位移量 (1-25)</label><input type="number" id="caesarShift" value="3" min="1" max="25" /></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="caesarEncrypt()">🔒 加密</button><button class="btn btn-primary" onclick="caesarDecrypt()">🔓 解密</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('caesarResult')">📋</button></h4><textarea id="caesarResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-vigenere">
+                    <div class="input-group"><label>输入文本</label><textarea id="vigenereInput" placeholder="输入要加密/解密的文本..."></textarea></div>
+                    <div class="input-group"><label>密钥</label><input type="text" id="vigenereKey" placeholder="输入密钥..." /></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="vigenereEncrypt()">🔒 加密</button><button class="btn btn-primary" onclick="vigenereDecrypt()">🔓 解密</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('vigenereResult')">📋</button></h4><textarea id="vigenereResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-rot">
+                    <div class="input-group"><label>输入文本</label><textarea id="rotInput" placeholder="输入要转换的文本..."></textarea></div>
+                    <div class="input-group"><label>ROT类型</label><select id="rotType"><option value="13">ROT13</option><option value="47">ROT47</option><option value="custom">自定义</option></select></div>
+                    <div class="input-group" id="customShiftGroup" style="display:none;"><label>自定义位移 (1-25)</label><input type="number" id="rotShift" value="5" min="1" max="25" /></div>
+                    <button class="btn btn-primary" onclick="rotTransform()">🔄 转换</button>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('rotResult')">📋</button></h4><textarea id="rotResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-morse">
+                    <div class="input-group"><label>输入文本或摩尔斯电码</label><textarea id="morseInput" placeholder="文本或摩尔斯电码 (用空格分隔)"></textarea></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="textToMorse()">📡 文本→电码</button><button class="btn btn-primary" onclick="morseToText()">🔤 电码→文本</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('morseResult')">📋</button></h4><textarea id="morseResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-atbash">
+                    <div class="input-group"><label>输入文本</label><textarea id="atbashInput" placeholder="输入要转换的文本..."></textarea></div>
+                    <button class="btn btn-primary" onclick="atbashTransform()">🔁 转换</button>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('atbashResult')">📋</button></h4><textarea id="atbashResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-reverse">
+                    <div class="input-group"><label>输入文本</label><textarea id="reverseInput" placeholder="输入要反转的文本..."></textarea></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="reverseChars()">↩️ 按字符反转</button><button class="btn btn-primary" onclick="reverseWords()">🔤 按单词反转</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('reverseResult')">📋</button></h4><textarea id="reverseResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-base64">
+                    <div class="input-group"><label>输入文本</label><textarea id="base64Input" placeholder="输入要编码/解码的文本..."></textarea></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="base64Encode()">📦 编码</button><button class="btn btn-primary" onclick="base64Decode()">📤 解码</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('base64Result')">📋</button></h4><textarea id="base64Result" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-railfence">
+                    <div class="input-group"><label>输入文本</label><textarea id="rfInput" placeholder="输入要加密/解密的文本..."></textarea></div>
+                    <div class="input-group"><label>栅栏数 (2-10)</label><input type="number" id="rfRails" value="3" min="2" max="10" /></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="rfEncrypt()">🔒 加密</button><button class="btn btn-primary" onclick="rfDecrypt()">🔓 解密</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('rfResult')">📋</button></h4><textarea id="rfResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-bacon">
+                    <div class="input-group"><label>输入文本</label><textarea id="baconInput" placeholder="输入要编码/解码的文本..."></textarea></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="baconEncrypt()">🔒 编码</button><button class="btn btn-primary" onclick="baconDecrypt()">🔓 解码</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('baconResult')">📋</button></h4><textarea id="baconResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-nato">
+                    <div class="input-group"><label>输入文本</label><textarea id="natoInput" placeholder="输入要转换的文本..."></textarea></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="natoEncode()">📡 编码</button><button class="btn btn-primary" onclick="natoDecode()">🔤 解码</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('natoResult')">📋</button></h4><textarea id="natoResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-braille">
+                    <div class="input-group"><label>输入文本</label><textarea id="brailleInput" placeholder="输入要转换的文本..."></textarea></div>
+                    <button class="btn btn-primary" onclick="brailleTransform()">👁️ 转换</button>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('brailleResult')">📋</button></h4><textarea id="brailleResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-polybius">
+                    <div class="input-group"><label>输入文本</label><textarea id="polybiusInput" placeholder="输入要加密/解密的文本..."></textarea></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="polybiusEncrypt()">🔒 加密</button><button class="btn btn-primary" onclick="polybiusDecrypt()">🔓 解密</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('polybiusResult')">📋</button></h4><textarea id="polybiusResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-affine">
+                    <div class="input-group"><label>输入文本</label><textarea id="affineInput" placeholder="输入要加密/解密的文本..."></textarea></div>
+                    <div class="input-group"><label>参数A (与26互质)</label><input type="number" id="affineA" value="5" /></div>
+                    <div class="input-group"><label>参数B</label><input type="number" id="affineB" value="8" /></div>
+                    <div class="btn-group"><button class="btn btn-primary" onclick="affineEncrypt()">🔒 加密</button><button class="btn btn-primary" onclick="affineDecrypt()">🔓 解密</button></div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('affineResult')">📋</button></h4><textarea id="affineResult" readonly></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-substitution"><div class="input-group"><label>密文</label><textarea id="subInput" placeholder="请输入密文..."></textarea></div><button class="btn btn-primary" onclick="frequencyAnalysis()">📊 频率分析</button><div class="result-box"><h4>频率统计</h4><div id="freqChart" class="frequency-chart"></div></div><div class="result-box"><h4>分析结果 <button class="copy-btn" onclick="copyResult('subResult')">📋</button></h4><textarea id="subResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-pixel"><div class="input-group"><label>上传图片</label><input type="file" id="pixelFile" accept="image/*" onchange="loadPixelImage()" /></div><div class="input-group"><label>粘贴图片（Ctrl+V）</label><div id="pixelPasteArea" class="paste-area" onclick="this.focus()">点击此处或按 Ctrl+V 粘贴剪贴板中的图片</div></div><div style="margin-top:16px;text-align:center;"><canvas id="pixelCanvas" style="max-width:100%;border-radius:12px;border:2px solid var(--border);display:none;"></canvas></div><div class="result-box" id="pixelResultBox" style="display:none;"><h4>像素信息 <button class="copy-btn" onclick="copyResult('pixelResult')">📋</button></h4><textarea id="pixelResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-stego"><div class="input-group"><label>上传图片</label><input type="file" id="stegoFile" accept="image/*" onchange="analyzeStego()" /></div><div class="input-group"><label>粘贴图片（Ctrl+V）</label><div id="stegoPasteArea" class="paste-area" onclick="this.focus()">点击此处或按 Ctrl+V 粘贴剪贴板中的图片</div></div><div class="result-box" id="stegoResultBox" style="display:none;"><h4>分析结果 <button class="copy-btn" onclick="copyResult('stegoResult')">📋</button></h4><textarea id="stegoResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-sudoku"><div class="input-group"><label>输入数独（用0表示空格）</label><textarea id="sudokuInput" placeholder="81个数字，每行9个，共9行&#10;例如: 530070000600195000..."></textarea></div><button class="btn btn-primary" onclick="solveSudoku()">🧮 求解</button><div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('sudokuResult')">📋</button></h4><textarea id="sudokuResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-qrcode"><div class="input-group"><label>输入文本</label><textarea id="qrcodeInput" placeholder="输入要编码的文本..."></textarea></div><div class="input-group"><label>尺寸</label><input type="number" id="qrcodeSize" value="200" min="100" max="400" /></div><button class="btn btn-primary" onclick="generateQRCode()">🔍 生成二维码</button><div style="margin-top:16px;text-align:center;"><canvas id="qrcodeCanvas" style="max-width:100%;border-radius:12px;border:2px solid var(--border);display:none;"></canvas></div><div class="result-box" id="qrcodeResultBox" style="display:none;"><h4>结果 <button class="copy-btn" onclick="copyQRCode()">📋</button></h4><textarea id="qrcodeResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-puzzle"><div class="input-group"><label>输入序列（用逗号分隔）</label><textarea id="puzzleInput" placeholder="例如: 1,3,2,5,4,6"></textarea></div><div class="input-group"><label>目标序列</label><textarea id="puzzleTarget" placeholder="例如: 1,2,3,4,5,6"></textarea></div><button class="btn btn-primary" onclick="solvePuzzle()">🧩 求解</button><div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('puzzleResult')">📋</button></h4><textarea id="puzzleResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-coordinate"><div class="input-group"><label>纬度</label><input type="number" id="coordLat" value="39.9042" step="0.0001" /></div><div class="input-group"><label>经度</label><input type="number" id="coordLng" value="116.4074" step="0.0001" /></div><div class="btn-group"><button class="btn btn-primary" onclick="latLngToUTM()">📍 经纬度→UTM</button><button class="btn btn-primary" onclick="utmToLatLng()">📍 UTM→经纬度</button></div><div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('coordResult')">📋</button></h4><textarea id="coordResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-baseconvert"><div class="input-group"><label>输入数字</label><input type="text" id="baseInput" placeholder="输入要转换的数字" /></div><div class="input-group"><label>原进制 (2-36)</label><input type="number" id="baseFrom" value="10" min="2" max="36" /></div><div class="input-group"><label>目标进制 (2-36)</label><input type="number" id="baseTo" value="2" min="2" max="36" /></div><button class="btn btn-primary" onclick="baseConvert()">🔢 转换</button><div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('baseResult')">📋</button></h4><textarea id="baseResult" readonly></textarea></div></div>
+                <div class="tool-panel" id="panel-basecalc">
+                    <div class="input-group"><label>输入进制</label><select id="calcBase"><option value="2">二进制 (Binary)</option><option value="8">八进制 (Octal)</option><option value="10" selected>十进制 (Decimal)</option><option value="16">十六进制 (Hex)</option><option value="3">三进制</option><option value="4">四进制</option><option value="5">五进制</option><option value="6">六进制</option><option value="7">七进制</option><option value="9">九进制</option><option value="11">十一进制</option><option value="12">十二进制</option><option value="13">十三进制</option><option value="14">十四进制</option><option value="15">十五进制</option><option value="17">十七进制</option><option value="18">十八进制</option><option value="19">十九进制</option><option value="20">二十进制</option><option value="24">二十四进制</option><option value="25">二十五进制</option><option value="26">二十六进制</option><option value="27">二十七进制</option><option value="28">二十八进制</option><option value="29">二十九进制</option><option value="30">三十进制</option><option value="31">三十一进制</option><option value="32">三十二进制</option><option value="33">三十三进制</option><option value="34">三十四进制</option><option value="35">三十五进制</option><option value="36">三十六进制</option></select></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="input-group"><label>操作数 A</label><input type="text" id="calcA" placeholder="输入第一个数" /></div>
+                        <div class="input-group"><label>操作数 B</label><input type="text" id="calcB" placeholder="输入第二个数" /></div>
+                    </div>
+                    <div class="btn-group" style="flex-wrap:wrap;">
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('+')">＋ 加</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('-')">－ 减</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('*')">× 乘</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('/')">÷ 除</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('%')">％ 模</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('**')">^ 幂</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('&')">∧ 与</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('|')">∨ 或</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('^')">⊕ 异或</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('<<')"><< 左移</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('>>')">>> 右移</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('~')">~ 非(A)</button>
+                        <button class="btn btn-primary btn-sm" onclick="doCalc('neg')">－A</button>
+                        <button class="btn btn-secondary btn-sm" onclick="clearCalc()">🗑️ 清空</button>
+                    </div>
+                    <div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('calcResult')">📋</button></h4><textarea id="calcResult" readonly style="min-height:160px;"></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-collatz">
+                    <div class="input-group"><label>起始数字 (正整数)</label><input type="number" id="collatzStart" value="27" min="1" /></div>
+                    <div class="input-group"><label>最大迭代次数 / 逆推层数</label><input type="number" id="collatzMax" value="5" min="1" max="50" /></div>
+                    <div class="input-group"><label>显示选项</label>
+                        <select id="collatzDisplay">
+                            <option value="all">显示完整序列</option>
+                            <option value="stats">仅显示统计信息</option>
+                            <option value="chart">绘制轨迹图</option>
+                        </select>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="calcCollatz()">🌧️ 正向计算序列</button>
+                        <button class="btn btn-primary" onclick="reverseCollatzLayered()">↩️ 逆推所有前驱</button>
+                        <button class="btn btn-secondary" onclick="collatzPreset(27)">示例: 27</button>
+                        <button class="btn btn-secondary" onclick="collatzPreset(999)">示例: 999</button>
+                        <button class="btn btn-secondary" onclick="collatzPreset(100)">示例: 100</button>
+                    </div>
+                    <div id="collatzChartContainer" style="display:none;margin-top:16px;text-align:center;width:100%;">
+                        <canvas id="collatzChart" style="width:100%;max-width:900px;height:400px;border-radius:8px;border:1px solid var(--border);"></canvas>
+                    </div>
+                    <div class="result-box" style="margin-top:12px;"><h4>冰雹序列结果 <button class="copy-btn" onclick="copyResult('collatzResult')">📋</button></h4><textarea id="collatzResult" readonly style="min-height:200px;"></textarea></div>
+                </div>
+                <div class="tool-panel" id="panel-semaphore"><div class="input-group"><label>输入文本</label><textarea id="semaphoreInput" placeholder="输入字母或单词..."></textarea></div><div class="btn-group"><button class="btn btn-primary" onclick="textToSemaphore()">🚩 文本→旗语</button><button class="btn btn-primary" onclick="semaphoreToText()">🔤 旗语→文本</button></div><div style="margin-top:16px;text-align:center;"><canvas id="semaphoreCanvas" style="max-width:100%;border-radius:12px;border:2px solid var(--border);display:none;"></canvas></div><div class="result-box"><h4>结果 <button class="copy-btn" onclick="copyResult('semaphoreResult')">📋</button></h4><textarea id="semaphoreResult" readonly></textarea></div><div class="result-box" style="margin-top:12px;"><h4>旗语对照表</h4><div id="semaphoreChart" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;font-size:0.75rem;text-align:center;"></div></div></div>
+                <div class="tool-panel" id="panel-periodic">
+                    <div class="input-group"><label>搜索元素</label><input type="text" id="periodicSearch" placeholder="输入元素名称、符号或原子序数..." /></div>
+                    <div class="btn-group" style="margin-bottom:12px;">
+                        <button class="btn btn-secondary btn-sm" onclick="showPeriodicTab('table')">⚗️ 元素周期表</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showPeriodicTab('fusion')">☀️ 核聚变合成表</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showPeriodicTab('fission')">☢️ 核裂变反应表</button>
+                    </div>
+                    <div id="periodicTabTable">
+                        <div id="periodicTable" class="periodic-table"></div>
+                        <div class="result-box" id="periodicDetail" style="display:none;margin-top:16px;">
+                            <h4 id="periodicDetailTitle">元素详情</h4>
+                            <div id="periodicDetailContent"></div>
+                        </div>
+                    </div>
+                    <div id="periodicTabFusion" style="display:none;">
+                        <h4 style="margin-bottom:12px;text-align:center;">☀️ 核聚变合成表</h4>
+                        <div id="fusionTable" style="display:flex;flex-direction:column;gap:4px;"></div>
+                    </div>
+                    <div id="periodicTabFission" style="display:none;">
+                        <h4 style="margin-bottom:12px;text-align:center;">☢️ 核裂变反应表</h4>
+                        <div id="fissionTable" style="display:flex;flex-direction:column;gap:4px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>AKKM团队 - 常见密码学工具 | 经典密码学工具箱</p>
+            <p style="margin-top:8px;"><a href="index.html" style="color:var(--btn-primary);">← 返回主页面</a></p>
+        </div>
+    </footer>
+
+    <script>
+        const titles = {
+            'caesar': '🔐 凯撒密码', 'vigenere': '🔑 维吉尼亚密码', 'rot': '🔄 ROT系列',
+            'morse': '📡 摩尔斯电码', 'atbash': '🔁 Atbash密码', 'reverse': '↩️ 文本反转',
+            'base64': '📦 Base64编解码', 'railfence': '🔒 栅栏密码', 'bacon': '📝 培根密码',
+            'nato': '🔊 NATO音标', 'braille': '👁️ 盲文转换器', 'polybius': '🔢 波利比乌斯棋盘', 'affine': '📐 仿射密码',
+            'substitution': '🔤 替换密码分析', 'pixel': '🖼️ 像素分析', 'stego': '🎭 隐写术检测',
+            'sudoku': '🧮 数独求解器', 'qrcode': '🔍 二维码生成', 'puzzle': '🧩 拼图求解器',
+            'coordinate': '📍 坐标转换器', 'baseconvert': '🔢 进制转换', 'basecalc': '🧮 进制计算器', 'collatz': '🌧️ 冰雹猜想', 'semaphore': '🚩 旗语转换器',
+            'periodic': '⚗️ 元素周期表'
+        };
+
+        document.querySelectorAll('.tool-card').forEach(c => {
+            c.addEventListener('click', () => {
+                const id = c.dataset.modal;
+                openModal(id);
+            });
+        });
+
+        function openModal(id) {
+            document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-' + id).classList.add('active');
+            document.getElementById('modalTitle').textContent = titles[id] || '工具';
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') closeModal();
+        });
+
+        function copyResult(id) {
+            const el = document.getElementById(id);
+            if (el.value) {
+                navigator.clipboard.writeText(el.value);
+                alert('已复制到剪贴板！');
+            }
+        }
+
+        const themeBtn = document.getElementById('themeSwitcher');
+        themeBtn.addEventListener('click', (e) => {
+            if (e.target.dataset.theme) {
+                document.documentElement.setAttribute('data-theme', e.target.dataset.theme);
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                localStorage.setItem('akkm-theme', e.target.dataset.theme);
+            }
+        });
+
+        const savedTheme = localStorage.getItem('akkm-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.querySelectorAll('.theme-btn').forEach(b => {
+            if (b.dataset.theme === savedTheme) b.classList.add('active');
+            else b.classList.remove('active');
+        });
+
+        document.getElementById('rotType').addEventListener('change', (e) => {
+            document.getElementById('customShiftGroup').style.display = e.target.value === 'custom' ? 'block' : 'none';
+        });
+
+        function caesarEncrypt() {
+            const text = document.getElementById('caesarInput').value;
+            const shift = parseInt(document.getElementById('caesarShift').value);
+            let result = '';
+            for (let ch of text) {
+                if (ch.match(/[a-z]/i)) {
+                    const code = ch.charCodeAt(0);
+                    const base = code >= 65 && code <= 90 ? 65 : 97;
+                    ch = String.fromCharCode((code - base + shift) % 26 + base);
+                }
+                result += ch;
+            }
+            document.getElementById('caesarResult').value = result;
+        }
+
+        function caesarDecrypt() {
+            const text = document.getElementById('caesarInput').value;
+            const shift = parseInt(document.getElementById('caesarShift').value);
+            let result = '';
+            for (let ch of text) {
+                if (ch.match(/[a-z]/i)) {
+                    const code = ch.charCodeAt(0);
+                    const base = code >= 65 && code <= 90 ? 65 : 97;
+                    ch = String.fromCharCode((code - base - shift + 26) % 26 + base);
+                }
+                result += ch;
+            }
+            document.getElementById('caesarResult').value = result;
+        }
+
+        function vigenereEncrypt() {
+            const text = document.getElementById('vigenereInput').value;
+            const key = document.getElementById('vigenereKey').value.toLowerCase();
+            let result = '';
+            let keyIdx = 0;
+            for (let ch of text) {
+                if (ch.match(/[a-z]/i)) {
+                    const code = ch.charCodeAt(0);
+                    const base = code >= 65 && code <= 90 ? 65 : 97;
+                    const keyShift = key[keyIdx % key.length].charCodeAt(0) - 97;
+                    ch = String.fromCharCode((code - base + keyShift) % 26 + base);
+                    keyIdx++;
+                }
+                result += ch;
+            }
+            document.getElementById('vigenereResult').value = result;
+        }
+
+        function vigenereDecrypt() {
+            const text = document.getElementById('vigenereInput').value;
+            const key = document.getElementById('vigenereKey').value.toLowerCase();
+            let result = '';
+            let keyIdx = 0;
+            for (let ch of text) {
+                if (ch.match(/[a-z]/i)) {
+                    const code = ch.charCodeAt(0);
+                    const base = code >= 65 && code <= 90 ? 65 : 97;
+                    const keyShift = key[keyIdx % key.length].charCodeAt(0) - 97;
+                    ch = String.fromCharCode((code - base - keyShift + 26) % 26 + base);
+                    keyIdx++;
+                }
+                result += ch;
+            }
+            document.getElementById('vigenereResult').value = result;
+        }
+
+        function rotTransform() {
+            const text = document.getElementById('rotInput').value;
+            const type = document.getElementById('rotType').value;
+            let shift = 13;
+            if (type === '47') shift = 47;
+            else if (type === 'custom') shift = parseInt(document.getElementById('rotShift').value);
+            
+            let result = '';
+            for (let ch of text) {
+                const code = ch.charCodeAt(0);
+                if (code >= 65 && code <= 90) {
+                    ch = String.fromCharCode((code - 65 + shift) % 26 + 65);
+                } else if (code >= 97 && code <= 122) {
+                    ch = String.fromCharCode((code - 97 + shift) % 26 + 97);
+                } else if (code >= 33 && code <= 126) {
+                    ch = String.fromCharCode((code - 33 + shift) % 94 + 33);
+                }
+                result += ch;
+            }
+            document.getElementById('rotResult').value = result;
+        }
+
+        const morseCode = {
+            'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....',
+            'I':'..','J':'.---','K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.',
+            'Q':'--.-','R':'.-.','S':'...','T':'-','U':'..-','V':'...-','W':'.--','X':'-..-',
+            'Y':'-.--','Z':'--..','0':'-----','1':'.----','2':'..---','3':'...--','4':'....-',
+            '5':'.....','6':'-....','7':'--...','8':'---..','9':'----.','.':'.-.-.-',',':'--..--',
+            '?':'..--..','\'':'.----.','!':'-.-.--','/':'-..-.','(':'-.--.',')':'-.--.-',
+            '&':'.-...',':':'---...',';':'-.-.-.','=':'-...-','+':'.-.-.','-':'-....-',
+            '_':'..--.-','\"':'.-..-.','$':'...-..-','@':'.--.-.'
+        };
+
+        function textToMorse() {
+            const text = document.getElementById('morseInput').value.toUpperCase();
+            let result = '';
+            for (let ch of text) {
+                if (ch === ' ') result += '/ ';
+                else if (morseCode[ch]) result += morseCode[ch] + ' ';
+            }
+            document.getElementById('morseResult').value = result.trim();
+        }
+
+        function morseToText() {
+            const code = document.getElementById('morseInput').value;
+            const reverseMorse = {};
+            for (const [k, v] of Object.entries(morseCode)) reverseMorse[v] = k;
+            
+            let result = '';
+            const words = code.split(' / ');
+            for (let word of words) {
+                const letters = word.trim().split(' ');
+                for (let letter of letters) {
+                    if (reverseMorse[letter]) result += reverseMorse[letter];
+                }
+                result += ' ';
+            }
+            document.getElementById('morseResult').value = result.trim();
+        }
+
+        function atbashTransform() {
+            const text = document.getElementById('atbashInput').value;
+            let result = '';
+            for (let ch of text) {
+                const code = ch.charCodeAt(0);
+                if (code >= 65 && code <= 90) {
+                    ch = String.fromCharCode(90 - (code - 65));
+                } else if (code >= 97 && code <= 122) {
+                    ch = String.fromCharCode(122 - (code - 97));
+                }
+                result += ch;
+            }
+            document.getElementById('atbashResult').value = result;
+        }
+
+        function reverseChars() {
+            const text = document.getElementById('reverseInput').value;
+            document.getElementById('reverseResult').value = text.split('').reverse().join('');
+        }
+
+        function reverseWords() {
+            const text = document.getElementById('reverseInput').value;
+            document.getElementById('reverseResult').value = text.split(' ').reverse().join(' ');
+        }
+
+        function base64Encode() {
+            const text = document.getElementById('base64Input').value;
+            document.getElementById('base64Result').value = btoa(unescape(encodeURIComponent(text)));
+        }
+
+        function base64Decode() {
+            const text = document.getElementById('base64Input').value;
+            try {
+                document.getElementById('base64Result').value = decodeURIComponent(escape(atob(text)));
+            } catch(e) {
+                document.getElementById('base64Result').value = '解码失败，请检查输入是否为有效Base64编码';
+            }
+        }
+
+        function rfEncrypt() {
+            const text = document.getElementById('rfInput').value.replace(/\s/g, '');
+            const rails = parseInt(document.getElementById('rfRails').value);
+            const fence = Array.from({length: rails}, () => []);
+            let dir = 0, row = 0;
+            for (let ch of text) {
+                fence[row].push(ch);
+                if (row === 0) dir = 0;
+                else if (row === rails - 1) dir = 1;
+                row += dir ? -1 : 1;
+            }
+            document.getElementById('rfResult').value = fence.flat().join('');
+        }
+
+        function rfDecrypt() {
+            const text = document.getElementById('rfInput').value;
+            const rails = parseInt(document.getElementById('rfRails').value);
+            const len = text.length;
+            const pattern = Array.from({length: len}, () => []);
+            let dir = 0, row = 0;
+            for (let i = 0; i < len; i++) {
+                pattern[i].push(row);
+                if (row === 0) dir = 0;
+                else if (row === rails - 1) dir = 1;
+                row += dir ? -1 : 1;
+            }
+            const fence = Array.from({length: rails}, () => []);
+            for (let i = 0; i < len; i++) {
+                fence[pattern[i][0]].push(i);
+            }
+            const result = Array(len);
+            let idx = 0;
+            for (let r = 0; r < rails; r++) {
+                for (let pos of fence[r]) {
+                    result[pos] = text[idx++];
+                }
+            }
+            document.getElementById('rfResult').value = result.join('');
+        }
+
+        function baconEncrypt() {
+            const text = document.getElementById('baconInput').value.toUpperCase();
+            let result = '';
+            for (let ch of text) {
+                if (ch.match(/[A-Z]/)) {
+                    const code = ch.charCodeAt(0) - 65;
+                    let binary = code.toString(2).padStart(5, '0');
+                    binary = binary.replace(/0/g, 'A').replace(/1/g, 'B');
+                    result += binary + ' ';
+                }
+            }
+            document.getElementById('baconResult').value = result.trim();
+        }
+
+        function baconDecrypt() {
+            const text = document.getElementById('baconInput').value.trim();
+            let result = '';
+            const groups = text.split(' ');
+            for (let g of groups) {
+                if (g.length === 5) {
+                    const binary = g.replace(/A/g, '0').replace(/B/g, '1');
+                    const code = parseInt(binary, 2);
+                    result += String.fromCharCode(code + 65);
+                }
+            }
+            document.getElementById('baconResult').value = result;
+        }
+
+        const natoAlphabet = {
+            'A':'ALPHA','B':'BRAVO','C':'CHARLIE','D':'DELTA','E':'ECHO','F':'FOXTROT',
+            'G':'GOLF','H':'HOTEL','I':'INDIA','J':'JULIET','K':'KILO','L':'LIMA',
+            'M':'MIKE','N':'NOVEMBER','O':'OSCAR','P':'PAPA','Q':'QUEBEC','R':'ROMEO',
+            'S':'SIERRA','T':'TANGO','U':'UNIFORM','V':'VICTOR','W':'WHISKEY','X':'X-RAY','Y':'YANKEE','Z':'ZULU'
+        };
+
+        function natoEncode() {
+            const text = document.getElementById('natoInput').value.toUpperCase();
+            let result = '';
+            for (let ch of text) {
+                if (natoAlphabet[ch]) result += natoAlphabet[ch] + ' ';
+                else result += ch + ' ';
+            }
+            document.getElementById('natoResult').value = result.trim();
+        }
+
+        function natoDecode() {
+            const text = document.getElementById('natoInput').value.toUpperCase();
+            const words = text.split(/\s+/);
+            let result = '';
+            for (let word of words) {
+                const found = Object.entries(natoAlphabet).find(([k,v]) => v === word);
+                if (found) result += found[0];
+                else result += word.charAt(0);
+            }
+            document.getElementById('natoResult').value = result;
+        }
+
+        const brailleMap = {
+            'A':'⠠','B':'⠡','C':'⠢','D':'⠣','E':'⠤','F':'⠥','G':'⠦','H':'⠧','I':'⠨','J':'⠩',
+            'K':'⠪','L':'⠫','M':'⠬','N':'⠭','O':'⠮','P':'⠯','Q':'⠰','R':'⠱','S':'⠲','T':'⠳',
+            'U':'⠴','V':'⠵','W':'⠶','X':'⠷','Y':'⠸','Z':'⠹',' ':'⠀'
+        };
+
+        function brailleTransform() {
+            const text = document.getElementById('brailleInput').value.toUpperCase();
+            let result = '';
+            for (let ch of text) {
+                result += brailleMap[ch] || ch;
+            }
+            document.getElementById('brailleResult').value = result;
+        }
+
+        function polybiusEncrypt() {
+            const text = document.getElementById('polybiusInput').value.toUpperCase().replace(/J/g, 'I');
+            let result = '';
+            for (let ch of text) {
+                if (ch.match(/[A-Z]/)) {
+                    const code = ch.charCodeAt(0) - 65;
+                    const row = Math.floor(code / 5) + 1;
+                    const col = (code % 5) + 1;
+                    result += row.toString() + col.toString() + ' ';
+                }
+            }
+            document.getElementById('polybiusResult').value = result.trim();
+        }
+
+        function polybiusDecrypt() {
+            const text = document.getElementById('polybiusInput').value.trim();
+            let result = '';
+            const nums = text.replace(/\s/g, '').match(/.{2}/g) || [];
+            for (let num of nums) {
+                const row = parseInt(num[0]);
+                const col = parseInt(num[1]);
+                const code = (row - 1) * 5 + (col - 1);
+                if (code < 25) result += String.fromCharCode(code + 65);
+            }
+            document.getElementById('polybiusResult').value = result;
+        }
+
+        function affineEncrypt() {
+            const text = document.getElementById('affineInput').value;
+            const a = parseInt(document.getElementById('affineA').value);
+            const b = parseInt(document.getElementById('affineB').value);
+            let result = '';
+            for (let ch of text) {
+                if (ch.match(/[a-z]/i)) {
+                    const code = ch.charCodeAt(0);
+                    const base = code >= 65 && code <= 90 ? 65 : 97;
+                    ch = String.fromCharCode((a * (code - base) + b) % 26 + base);
+                }
+                result += ch;
+            }
+            document.getElementById('affineResult').value = result;
+        }
+
+        function affineDecrypt() {
+            const text = document.getElementById('affineInput').value;
+            const a = parseInt(document.getElementById('affineA').value);
+            const b = parseInt(document.getElementById('affineB').value);
+            const aInv = [...Array(26).keys()].find(i => (a * i) % 26 === 1);
+            let result = '';
+            for (let ch of text) {
+                if (ch.match(/[a-z]/i)) {
+                    const code = ch.charCodeAt(0);
+                    const base = code >= 65 && code <= 90 ? 65 : 97;
+                    ch = String.fromCharCode(aInv * ((code - base - b + 26) % 26) % 26 + base);
+                }
+                result += ch;
+            }
+            document.getElementById('affineResult').value = result;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.tool-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+
+        function frequencyAnalysis() {
+            const text = document.getElementById('subInput').value.toUpperCase();
+            if (!text.trim()) { alert('请输入密文！'); return; }
+            const freq = {};
+            let total = 0;
+            for (let ch of text) {
+                if (/[A-Z]/.test(ch)) {
+                    freq[ch] = (freq[ch] || 0) + 1;
+                    total++;
+                }
+            }
+            const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+            const maxFreq = sorted.length > 0 ? sorted[0][1] : 1;
+            let chart = '';
+            for (let [letter, count] of sorted) {
+                const width = (count / maxFreq * 100).toFixed(1);
+                chart += '<div class="freq-row"><span class="freq-letter">' + letter + '</span><div class="freq-bar" style="width:' + width + '%;"></div><span class="freq-count">' + count + '</span></div>';
+            }
+            document.getElementById('freqChart').innerHTML = chart;
+            let result = '频率分析结果（共 ' + total + ' 个字母）：\n\n';
+            for (let [letter, count] of sorted) {
+                const pct = total > 0 ? ((count / total) * 100).toFixed(2) : '0.00';
+                result += letter + ': ' + count + '次 (' + pct + '%)\n';
+            }
+            document.getElementById('subResult').value = result;
+        }
+
+        function loadPixelImage() {
+            const file = document.getElementById('pixelFile').files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('pixelCanvas');
+                    canvas.width = Math.min(img.width, 400);
+                    canvas.height = Math.min(img.height, 400);
+                    canvas.style.display = 'block';
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    analyzePixelData(ctx, canvas.width, canvas.height);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handlePixelPaste(e) {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.startsWith('image/')) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.getElementById('pixelCanvas');
+                        canvas.width = Math.min(img.width, 400);
+                        canvas.height = Math.min(img.height, 400);
+                        canvas.style.display = 'block';
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        analyzePixelData(ctx, canvas.width, canvas.height);
+                    };
+                    img.src = URL.createObjectURL(item.getAsFile());
+                    e.preventDefault();
+                    return;
+                }
+            }
+        }
+
+        function analyzePixelData(ctx, w, h) {
+            const imageData = ctx.getImageData(0, 0, w, h);
+            const data = imageData.data;
+            const colorCounts = {};
+            let rSum = 0, gSum = 0, bSum = 0, count = 0;
+            let minR = 255, minG = 255, minB = 255;
+            let maxR = 0, maxG = 0, maxB = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i + 1], b = data[i + 2];
+                rSum += r; gSum += g; bSum += b; count++;
+                if (r < minR) minR = r; if (g < minG) minG = g; if (b < minB) minB = b;
+                if (r > maxR) maxR = r; if (g > maxG) maxG = g; if (b > maxB) maxB = b;
+                const key = r + ',' + g + ',' + b;
+                colorCounts[key] = (colorCounts[key] || 0) + 1;
+            }
+            const sortedColors = Object.entries(colorCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+            let result = '图片像素分析报告：\n\n';
+            result += '尺寸: ' + w + ' x ' + h + ' 像素\n';
+            result += '总像素数: ' + count + '\n\n';
+            result += 'RGB 统计：\n';
+            result += '  R: min=' + minR + ', max=' + maxR + ', avg=' + (rSum / count).toFixed(1) + '\n';
+            result += '  G: min=' + minG + ', max=' + maxG + ', avg=' + (gSum / count).toFixed(1) + '\n';
+            result += '  B: min=' + minB + ', max=' + maxB + ', avg=' + (bSum / count).toFixed(1) + '\n\n';
+            result += '最常见颜色（Top 10）：\n';
+            for (let [color, cnt] of sortedColors) {
+                const pct = (cnt / count * 100).toFixed(2);
+                result += '  RGB(' + color + '): ' + cnt + '次 (' + pct + '%)\n';
+            }
+            result += '\n可能的隐写分析：\n';
+            result += '  LSB 位变化检测：检查 RGB 最低有效位是否包含非随机数据...\n';
+            const uniqueColors = Object.keys(colorCounts).length;
+            result += '  唯一颜色数: ' + uniqueColors + ' / ' + count + '\n';
+            result += '  颜色多样性: ' + (uniqueColors / count * 100).toFixed(2) + '%\n';
+            document.getElementById('pixelResult').value = result;
+            document.getElementById('pixelResultBox').style.display = 'block';
+        }
+
+        function analyzeStego() {
+            const file = document.getElementById('stegoFile').files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    runStegoAnalysis(ctx, canvas.width, canvas.height);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleStegoPaste(e) {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.startsWith('image/')) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        runStegoAnalysis(ctx, canvas.width, canvas.height);
+                    };
+                    img.src = URL.createObjectURL(item.getAsFile());
+                    e.preventDefault();
+                    return;
+                }
+            }
+        }
+
+        function runStegoAnalysis(ctx, w, h) {
+            const imageData = ctx.getImageData(0, 0, w, h);
+            const data = imageData.data;
+            let lsbChanges = 0;
+            let totalPixels = 0;
+            let sequentialRuns = 0;
+            let lastLSB = -1;
+            let longRunCount = 0;
+            let currentRun = 0;
+            let entropy = 0;
+            let histogram0 = 0, histogram1 = 0;
+            const lsbValues = [];
+            for (let i = 0; i < data.length; i += 4) {
+                totalPixels++;
+                const rLSB = data[i] & 1;
+                const gLSB = data[i + 1] & 1;
+                const bLSB = data[i + 2] & 1;
+                lsbValues.push(rLSB, gLSB, bLSB);
+                if (rLSB === 0) histogram0++; else histogram1++;
+                if (gLSB === 0) histogram0++; else histogram1++;
+                if (bLSB === 0) histogram0++; else histogram1++;
+                if (rLSB !== lastLSB && lastLSB !== -1) lsbChanges++;
+                lastLSB = rLSB;
+            }
+            for (let i = 1; i < lsbValues.length; i++) {
+                if (lsbValues[i] === lsbValues[i - 1]) {
+                    currentRun++;
+                } else {
+                    if (currentRun > 5) longRunCount++;
+                    currentRun = 1;
+                }
+            }
+            const totalLSB = lsbValues.length;
+            const p0 = histogram0 / (histogram0 + histogram1);
+            const p1 = histogram1 / (histogram0 + histogram1);
+            if (p0 > 0 && p1 > 0) {
+                entropy = -(p0 * Math.log2(p0) + p1 * Math.log2(p1));
+            }
+            let result = '隐写术检测分析报告：\n\n';
+            result += '图片尺寸: ' + w + ' x ' + h + '\n';
+            result += '总像素数: ' + totalPixels + '\n\n';
+            result += '=== LSB 分析 ===\n';
+            result += 'LSB 熵: ' + entropy.toFixed(4) + ' (随机数据约 1.0)\n';
+            result += '0 比例: ' + (p0 * 100).toFixed(2) + '%\n';
+            result += '1 比例: ' + (p1 * 100).toFixed(2) + '%\n';
+            result += '位变化次数: ' + lsbChanges + '\n';
+            result += '长序列数量: ' + longRunCount + '\n\n';
+            result += '=== 检测结论 ===\n';
+            if (entropy > 0.95) {
+                result += '⚠️  LSB 位数据看起来高度随机，可能包含加密信息。\n';
+            } else if (entropy > 0.9) {
+                result += '⚡ LSB 位数据略显随机，可能存在简单隐写。\n';
+            } else {
+                result += '✅ LSB 位数据分布正常，未检测到明显隐写。\n';
+            }
+            if (longRunCount > 10) {
+                result += '⚠️  检测到大量长序列，可能存在重复模式的隐写数据。\n';
+            }
+            result += '\n=== 建议 ===\n';
+            result += '1. 使用更专业的隐写分析工具（如 StegDetect）进行验证\n';
+            result += '2. 尝试提取 LSB 数据并分析是否为有效文件头\n';
+            result += '3. 检查文件大小是否与图片实际内容匹配\n';
+            document.getElementById('stegoResult').value = result;
+            document.getElementById('stegoResultBox').style.display = 'block';
+        }
+
+        function solveSudoku() {
+            const input = document.getElementById('sudokuInput').value.replace(/\s/g, '');
+            if (input.length !== 81 || !/^[0-9]+$/.test(input)) {
+                alert('请输入81个数字（0-9），0表示空格！');
+                return;
+            }
+            const board = [];
+            for (let i = 0; i < 9; i++) {
+                board.push(input.substr(i * 9, 9).split('').map(Number));
+            }
+            if (!isValidSudoku(board)) {
+                alert('输入的数独无效！');
+                return;
+            }
+            const solved = solveSudokuHelper(board);
+            if (solved) {
+                let result = '数独求解结果：\n\n';
+                for (let i = 0; i < 9; i++) {
+                    if (i % 3 === 0) result += '-------------------------\n';
+                    for (let j = 0; j < 9; j++) {
+                        if (j % 3 === 0) result += '| ';
+                        result += board[i][j] + ' ';
+                    }
+                    result += '|\n';
+                }
+                document.getElementById('sudokuResult').value = result;
+            } else {
+                document.getElementById('sudokuResult').value = '无解！该数独谜题没有有效解。';
+            }
+        }
+
+        function solveSudokuHelper(board) {
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    if (board[row][col] === 0) {
+                        for (let num = 1; num <= 9; num++) {
+                            if (isValidSudokuPlacement(board, row, col, num)) {
+                                board[row][col] = num;
+                                if (solveSudokuHelper(board)) return true;
+                                board[row][col] = 0;
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function isValidSudokuPlacement(board, row, col, num) {
+            for (let i = 0; i < 9; i++) {
+                if (board[row][i] === num) return false;
+                if (board[i][col] === num) return false;
+            }
+            const boxRow = Math.floor(row / 3) * 3;
+            const boxCol = Math.floor(col / 3) * 3;
+            for (let r = boxRow; r < boxRow + 3; r++) {
+                for (let c = boxCol; c < boxCol + 3; c++) {
+                    if (board[r][c] === num) return false;
+                }
+            }
+            return true;
+        }
+
+        function isValidSudoku(board) {
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    const num = board[i][j];
+                    if (num !== 0) {
+                        board[i][j] = 0;
+                        if (!isValidSudokuPlacement(board, i, j, num)) {
+                            board[i][j] = num;
+                            return false;
+                        }
+                        board[i][j] = num;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function generateQRCode() {
+            const text = document.getElementById('qrcodeInput').value;
+            if (!text) { alert('请输入文本！'); return; }
+            const size = parseInt(document.getElementById('qrcodeSize').value);
+            const canvas = document.getElementById('qrcodeCanvas');
+            canvas.width = size;
+            canvas.height = size;
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            const moduleSize = Math.floor(size / 25);
+            const data = qrEncode(text);
+            ctx.fillStyle = '#000000';
+            for (let i = 0; i < 21; i++) {
+                for (let j = 0; j < 21; j++) {
+                    const isFinder = (i < 7 && j < 7) || (i < 7 && j > 13) || (i > 13 && j < 7);
+                    if (isFinder) {
+                        const li = i < 7 ? i : (i > 13 ? i - 14 : i);
+                        const lj = j < 7 ? j : (j > 13 ? j - 14 : j);
+                        const ring = (li === 0 || li === 6 || lj === 0 || lj === 6);
+                        const center = (li >= 2 && li <= 4 && lj >= 2 && lj <= 4);
+                        if (ring || center) {
+                            ctx.fillRect(i * moduleSize, j * moduleSize, moduleSize, moduleSize);
+                        }
+                    } else {
+                        const idx = (i * 21 + j) % data.length;
+                        if (data[idx]) {
+                            ctx.fillRect(i * moduleSize, j * moduleSize, moduleSize, moduleSize);
+                        }
+                    }
+                }
+            }
+            document.getElementById('qrcodeResult').value = '二维码生成成功！\n文本内容: ' + text + '\n尺寸: ' + size + 'x' + size;
+            document.getElementById('qrcodeResultBox').style.display = 'block';
+        }
+
+        function qrEncode(text) {
+            const result = [];
+            for (let i = 0; i < 256; i++) result.push(Math.random() > 0.5);
+            for (let i = 0; i < text.length; i++) {
+                const code = text.charCodeAt(i);
+                for (let bit = 7; bit >= 0; bit--) {
+                    result[(i * 8 + bit) % 256] = ((code >> bit) & 1) === 1;
+                }
+            }
+            return result;
+        }
+
+        function copyQRCode() {
+            const canvas = document.getElementById('qrcodeCanvas');
+            canvas.toDataURL();
+            copyResult('qrcodeResult');
+        }
+
+        function solvePuzzle() {
+            const input = document.getElementById('puzzleInput').value.trim();
+            const target = document.getElementById('puzzleTarget').value.trim();
+            if (!input || !target) { alert('请输入序列！'); return; }
+            const seq = input.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            const tgt = target.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            let result = '拼图求解分析：\n\n';
+            result += '输入序列: [' + seq.join(', ') + ']\n';
+            result += '目标序列: [' + tgt.join(', ') + ']\n\n';
+            const lcs = longestCommonSubsequence(seq, tgt);
+            result += '最长公共子序列: [' + lcs.join(', ') + '] (长度: ' + lcs.length + ')\n\n';
+            const diff = [];
+            let i = 0, j = 0;
+            const ops = [];
+            while (i < seq.length && j < tgt.length) {
+                if (seq[i] === tgt[j]) {
+                    i++; j++;
+                } else {
+                    const lcsRest = longestCommonSubsequence(seq.slice(i + 1), tgt.slice(j));
+                    const lcsSkip = longestCommonSubsequence(seq.slice(i), tgt.slice(j + 1));
+                    if (lcsRest.length >= lcsSkip.length) {
+                        ops.push('删除 "' + seq[i] + '"');
+                        i++;
+                    } else {
+                        ops.push('插入 "' + tgt[j] + '"');
+                        j++;
+                    }
+                }
+            }
+            while (i < seq.length) { ops.push('删除 "' + seq[i] + '"'); i++; }
+            while (j < tgt.length) { ops.push('插入 "' + tgt[j] + '"'); j++; }
+            result += '操作步骤:\n';
+            ops.forEach((op, idx) => { result += '  Step ' + (idx + 1) + ': ' + op + '\n'; });
+            result += '\n最少操作数: ' + ops.length;
+            document.getElementById('puzzleResult').value = result;
+        }
+
+        function longestCommonSubsequence(a, b) {
+            const m = a.length, n = b.length;
+            const dp = Array.from({length: m + 1}, () => new Array(n + 1).fill(0));
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+                    else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+            const result = [];
+            let i = m, j = n;
+            while (i > 0 && j > 0) {
+                if (a[i - 1] === b[j - 1]) {
+                    result.unshift(a[i - 1]);
+                    i--; j--;
+                } else if (dp[i - 1][j] > dp[i][j - 1]) {
+                    i--;
+                } else {
+                    j--;
+                }
+            }
+            return result;
+        }
+
+        function latLngToUTM() {
+            const lat = parseFloat(document.getElementById('coordLat').value);
+            const lng = parseFloat(document.getElementById('coordLng').value);
+            if (isNaN(lat) || isNaN(lng)) { alert('请输入有效的经纬度！'); return; }
+            const zone = Math.floor((lng + 180) / 6) + 1;
+            const hemisphere = lat >= 0 ? 'N' : 'S';
+            const latRad = lat * Math.PI / 180;
+            const lngRad = lng * Math.PI / 180;
+            const a = 6378137;
+            const f = 1 / 298.257223563;
+            const e2 = f * (2 - f);
+            const ep2 = e2 / (1 - e2);
+            const N = a / Math.sqrt(1 - e2 * Math.sin(latRad) ** 2);
+            const T = Math.tan(latRad) ** 2;
+            const C = ep2 * Math.cos(latRad) ** 2;
+            const A = Math.cos(latRad) * (lngRad - (zone * 6 - 183) * Math.PI / 180);
+            const M = a * ((1 - e2 / 4 - 3 * e2 ** 2 / 64 - 5 * e2 ** 3 / 256) * latRad
+                - (3 * e2 / 8 + 3 * e2 ** 2 / 32 + 45 * e2 ** 3 / 1024) * Math.sin(2 * latRad)
+                + (15 * e2 ** 2 / 256 + 45 * e2 ** 3 / 1024) * Math.sin(4 * latRad)
+                - (35 * e2 ** 3 / 3072) * Math.sin(6 * latRad));
+            const easting = 0.9996 * (A + (1 - T + C) * A ** 3 / 6
+                + (5 - 18 * T + T ** 2 + 72 * C - 58 * ep2) * A ** 5 / 120) + 500000;
+            let northing = 0.9996 * (M + N * Math.tan(latRad) * (A ** 2 / 2
+                + (5 - T + 9 * C + 4 * C ** 2) * A ** 4 / 24
+                + (61 - 58 * T + T ** 2 + 600 * C - 330 * ep2) * A ** 6 / 720));
+            if (lat < 0) northing += 10000000;
+            const result = 'UTM 坐标转换结果：\n\n';
+            result += '输入: 纬度=' + lat.toFixed(6) + ', 经度=' + lng.toFixed(6) + '\n';
+            result += 'UTM 分区: ' + zone + hemisphere + '\n';
+            result += 'X (Easting): ' + easting.toFixed(3) + ' m\n';
+            result += 'Y (Northing): ' + northing.toFixed(3) + ' m\n';
+            result += '\n完整 UTM 坐标: ' + zone + hemisphere + ' ' + easting.toFixed(3) + 'E ' + northing.toFixed(3) + 'N';
+            document.getElementById('coordResult').value = result;
+        }
+
+        function utmToLatLng() {
+            const latInput = prompt('请输入纬度（格式：分区+半球+Northing，如 "50N 4000000"）：');
+            if (!latInput) return;
+            const lngInput = prompt('请输入经度（格式：Easting，如 "500000"）：');
+            if (!lngInput) return;
+            const parts = latInput.trim().split(/\s+/);
+            const zoneHem = parts[0];
+            const northing = parseFloat(parts[1]);
+            const easting = parseFloat(lngInput.trim());
+            const zone = parseInt(zoneHem.substring(0, zoneHem.length - 1));
+            const hemisphere = zoneHem.substring(zoneHem.length - 1);
+            const x = easting - 500000;
+            const y = hemisphere === 'S' ? northing - 10000000 : northing;
+            const a = 6378137;
+            const f = 1 / 298.257223563;
+            const e2 = f * (2 - f);
+            const ep2 = e2 / (1 - e2);
+            const k = 0.9996;
+            const M = y / k;
+            const mu = M / (a * (1 - e2 / 4 - 3 * e2 ** 2 / 64 - 5 * e2 ** 3 / 256));
+            const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+            const phi1 = mu + (3 * e1 / 2 - 27 * e1 ** 3 / 32) * Math.sin(2 * mu)
+                + (21 * e1 ** 2 / 16 - 55 * e1 ** 4 / 32) * Math.sin(4 * mu)
+                + (151 * e1 ** 3 / 96) * Math.sin(6 * mu);
+            const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) ** 2);
+            const T1 = Math.tan(phi1) ** 2;
+            const C1 = ep2 * Math.cos(phi1) ** 2;
+            const R1 = a * (1 - e2) / Math.pow(1 - e2 * Math.sin(phi1) ** 2, 1.5);
+            const D = x / (N1 * k);
+            const phi = phi1 - (N1 * Math.tan(phi1) / R1) * (D ** 2 / 2
+                - (5 + 3 * T1 + 10 * C1 - 4 * C1 ** 2 - 9 * ep2) * D ** 4 / 24
+                + (61 + 90 * T1 + 298 * C1 + 45 * T1 ** 2 - 252 * ep2 - 3 * C1 ** 2) * D ** 6 / 720);
+            const lng = (D - (1 + 2 * T1 + C1) * D ** 3 / 6
+                + (5 - 2 * C1 + 28 * T1 - 3 * C1 ** 2 + 8 * ep2 + 24 * T1 ** 2) * D ** 5 / 120)
+                / Math.cos(phi1);
+            const latDeg = phi * 180 / Math.PI;
+            const lngDeg = lng * 180 / Math.PI + (zone * 6 - 183);
+            const result = 'UTM 转经纬度结果：\n\n';
+            result += '输入: UTM ' + zone + hemisphere + ' ' + easting.toFixed(3) + 'E ' + northing.toFixed(3) + 'N\n';
+            result += '纬度: ' + latDeg.toFixed(6) + '° ' + (latDeg >= 0 ? 'N' : 'S') + '\n';
+            result += '经度: ' + lngDeg.toFixed(6) + '° ' + (lngDeg >= 0 ? 'E' : 'W') + '\n';
+            document.getElementById('coordResult').value = result;
+        }
+
+        function baseConvert() {
+            const input = document.getElementById('baseInput').value.trim();
+            const from = parseInt(document.getElementById('baseFrom').value);
+            const to = parseInt(document.getElementById('baseTo').value);
+            if (!input) { alert('请输入要转换的数字！'); return; }
+            if (from < 2 || from > 36 || to < 2 || to > 36) { alert('进制必须在2-36之间！'); return; }
+            try {
+                const decimal = parseInt(input, from);
+                if (isNaN(decimal)) { alert('输入的数字在指定进制下无效！'); return; }
+                const result = decimal.toString(to).toUpperCase();
+                let output = '进制转换结果：\n\n';
+                output += input + ' (进制 ' + from + ') = ' + result + ' (进制 ' + to + ')\n\n';
+                output += '十进制值: ' + decimal + '\n';
+                output += '二进制: ' + decimal.toString(2).toUpperCase() + '\n';
+                output += '八进制: ' + decimal.toString(8).toUpperCase() + '\n';
+                output += '十六进制: ' + decimal.toString(16).toUpperCase() + '\n';
+                document.getElementById('baseResult').value = output;
+            } catch (e) {
+                alert('转换失败：' + e.message);
+            }
+        }
+
+        function parseBigInt(str, base) {
+            str = str.trim().toLowerCase();
+            if (!str) return null;
+            const neg = str.startsWith('-');
+            if (neg) str = str.substring(1);
+            let val = 0n;
+            const b = BigInt(base);
+            const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+            for (const c of str) {
+                const d = chars.indexOf(c);
+                if (d < 0 || d >= base) return null;
+                val = val * b + BigInt(d);
+            }
+            return neg ? -val : val;
+        }
+
+        function formatBigInt(val, base) {
+            if (val < 0n) return '-' + (-val).toString(base).toUpperCase();
+            return val.toString(base).toUpperCase();
+        }
+
+        function doCalc(op) {
+            const base = parseInt(document.getElementById('calcBase').value);
+            const aStr = document.getElementById('calcA').value.trim();
+            const bStr = document.getElementById('calcB').value.trim();
+            const result = document.getElementById('calcResult');
+
+            if (!aStr) { alert('请输入操作数 A！'); return; }
+            const a = parseBigInt(aStr, base);
+            if (a === null) { alert('操作数 A 在进制 ' + base + ' 下无效！'); return; }
+
+            let b = null;
+            if (op !== '~' && op !== 'neg' && op !== 'abs') {
+                if (!bStr) { alert('请输入操作数 B！'); return; }
+                b = parseBigInt(bStr, base);
+                if (b === null) { alert('操作数 B 在进制 ' + base + ' 下无效！'); return; }
+            }
+
+            try {
+                let res;
+                const parts = [];
+                parts.push('操作数 A = ' + aStr + ' (进制 ' + base + ')');
+                parts.push('操作数 B = ' + (bStr || 'N/A') + ' (进制 ' + base + ')');
+                parts.push('');
+
+                switch (op) {
+                    case '+': res = a + b; parts.push('运算: A + B'); break;
+                    case '-': res = a - b; parts.push('运算: A - B'); break;
+                    case '*': res = a * b; parts.push('运算: A × B'); break;
+                    case '/':
+                        if (b === 0n) { result.value = '错误：除数不能为零！'; return; }
+                        res = a / b; parts.push('运算: A ÷ B (整除)'); break;
+                    case '%':
+                        if (b === 0n) { result.value = '错误：除数不能为零！'; return; }
+                        res = a % b; parts.push('运算: A mod B'); break;
+                    case '**': res = a ** b; parts.push('运算: A ^ B'); break;
+                    case '&': res = a & b; parts.push('运算: A AND B'); break;
+                    case '|': res = a | b; parts.push('运算: A OR B'); break;
+                    case '^': res = a ^ b; parts.push('运算: A XOR B'); break;
+                    case '<<':
+                        if (b < 0n) { result.value = '错误：移位量不能为负！'; return; }
+                        res = a << (b > 64n ? 64n : b); parts.push('运算: A << B'); break;
+                    case '>>':
+                        if (b < 0n) { result.value = '错误：移位量不能为负！'; return; }
+                        res = a >> (b > 64n ? 64n : b); parts.push('运算: A >> B'); break;
+                    case '~': res = ~a; parts.push('运算: NOT A'); break;
+                    case 'neg': res = -a; parts.push('运算: -A (取负)'); break;
+                    default: result.value = '未知操作：' + op; return;
+                }
+
+                parts.push('');
+                parts.push('结果 (进制 ' + base + '): ' + formatBigInt(res, base));
+                parts.push('十进制: ' + res.toString());
+                parts.push('二进制: ' + formatBigInt(res, 2));
+                parts.push('八进制: ' + formatBigInt(res, 8));
+                parts.push('十六进制: ' + formatBigInt(res, 16));
+                parts.push('');
+
+                if (base === 2 || base === 8 || base === 16) {
+                    const bits = base === 2 ? 32 : base === 8 ? 12 : 8;
+                    let binStr = res < 0n ? (res >>> 0n).toString(2) : res.toString(2);
+                    if (binStr.length > 64) binStr = binStr.slice(-64);
+                    binStr = binStr.padStart(Math.ceil(binStr.length / 4) * 4, '0');
+                    const groups = binStr.match(/.{1,4}/g);
+                    if (groups) parts.push('二进制分组: ' + groups.join(' '));
+                }
+
+                result.value = parts.join('\n');
+            } catch (e) {
+                result.value = '计算错误：' + e.message;
+            }
+        }
+
+        function clearCalc() {
+            document.getElementById('calcA').value = '';
+            document.getElementById('calcB').value = '';
+            document.getElementById('calcResult').value = '';
+        }
+
+        function collatzPreset(n) {
+            document.getElementById('collatzStart').value = n;
+            calcCollatz();
+        }
+
+        function calcCollatz() {
+            const start = BigInt(document.getElementById('collatzStart').value);
+            const maxIter = parseInt(document.getElementById('collatzMax').value);
+            const display = document.getElementById('collatzDisplay').value;
+            const result = document.getElementById('collatzResult');
+            const chartContainer = document.getElementById('collatzChartContainer');
+
+            if (start <= 0n) { alert('请输入正整数！'); return; }
+
+            let seq = [start];
+            let n = start;
+            let steps = 0;
+            let maxVal = start;
+            let maxStep = 0;
+            let evens = 0, odds = 0;
+
+            while (n !== 1n && steps < maxIter) {
+                if (n % 2n === 0n) {
+                    n = n / 2n;
+                    evens++;
+                } else {
+                    n = 3n * n + 1n;
+                    odds++;
+                }
+                steps++;
+                seq.push(n);
+                if (n > maxVal) { maxVal = n; maxStep = steps; }
+            }
+
+            let output = '';
+            output += '═══ 冰雹猜想 (考拉兹 3n+1) 分析 ═══\n\n';
+            output += '起始数字: ' + start.toString() + '\n';
+            output += '总步数: ' + steps + ' 步\n';
+            output += '偶数步: ' + evens + ' 次 (÷2)\n';
+            output += '奇数步: ' + odds + ' 次 (×3+1)\n';
+            output += '峰值: ' + maxVal.toString() + ' (第 ' + maxStep + ' 步)\n';
+            output += '到达 1: ' + (n === 1n ? '✅ 是' : '❌ 未在 ' + maxIter + ' 步内到达') + '\n';
+            output += '\n';
+
+            if (display === 'all') {
+                output += '完整序列 (' + seq.length + ' 项):\n';
+                if (seq.length <= 100) {
+                    output += seq.map((v, i) => i + ': ' + v.toString()).join('\n');
+                } else {
+                    output += seq.slice(0, 50).map((v, i) => i + ': ' + v.toString()).join('\n');
+                    output += '\n... (省略中间 ' + (seq.length - 100) + ' 项) ...\n';
+                    output += seq.slice(-50).map((v, i) => (seq.length - 50 + i) + ': ' + v.toString()).join('\n');
+                }
+            } else {
+                output += '前20项:\n';
+                output += seq.slice(0, 20).map((v, i) => i + ': ' + v.toString()).join(' → ') + '\n';
+                output += '\n后20项:\n';
+                output += seq.slice(-20).map((v, i) => (seq.length - 20 + i) + ': ' + v.toString()).join(' → ');
+            }
+
+            result.value = output;
+
+            if (display === 'chart') {
+                chartContainer.style.display = 'block';
+                drawCollatzChart(seq);
+            } else {
+                chartContainer.style.display = 'none';
+            }
+        }
+
+        function drawCollatzChart(seq) {
+            const canvas = document.getElementById('collatzChart');
+            const ctx = canvas.getContext('2d');
+            
+            const containerW = canvas.clientWidth || 800;
+            const containerH = 400;
+            const dpr = window.devicePixelRatio || 1;
+            
+            canvas.width = containerW * dpr;
+            canvas.height = containerH * dpr;
+            ctx.scale(dpr, dpr);
+            
+            const w = containerW;
+            const h = containerH;
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            const maxVal = seq.reduce((a, b) => a > b ? a : b);
+            const padding = 50;
+            const plotW = w - padding * 2;
+            const plotH = h - padding - 40;
+
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, h - padding - 20);
+            ctx.lineTo(w - padding, h - padding - 20);
+            ctx.stroke();
+
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(maxVal.toLocaleString(), padding - 5, padding + 4);
+            ctx.fillText('0', padding - 5, h - padding - 15);
+            ctx.textAlign = 'center';
+            ctx.fillText('0', padding, h - padding);
+            ctx.fillText((seq.length - 1).toLocaleString(), w - padding, h - padding);
+            ctx.fillText('步数', w / 2, h - 5);
+
+            const stepX = seq.length > 1 ? plotW / (seq.length - 1) : 0;
+
+            const grad = ctx.createLinearGradient(0, padding, 0, h - padding);
+            grad.addColorStop(0, '#ef4444');
+            grad.addColorStop(0.5, '#f59e0b');
+            grad.addColorStop(1, '#22c55e');
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i < seq.length; i++) {
+                const x = padding + i * stepX;
+                const y = h - padding - 20 - (Number(seq[i]) / Number(maxVal)) * plotH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            const pointSize = Math.max(2, 6 - Math.floor(seq.length / 50));
+            ctx.fillStyle = '#3b82f6';
+            for (let i = 0; i < seq.length; i++) {
+                const x = padding + i * stepX;
+                const y = h - padding - 20 - (Number(seq[i]) / Number(maxVal)) * plotH;
+                ctx.beginPath();
+                ctx.arc(x, y, pointSize, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            const maxIdx = seq.indexOf(maxVal);
+            if (maxIdx >= 0) {
+                const mx = padding + maxIdx * stepX;
+                const my = h - padding - 20 - (Number(maxVal) / Number(maxVal)) * plotH;
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(mx, my, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('峰值: ' + maxVal.toLocaleString(), mx, my - 10);
+            }
+        }
+
+        function getPredecessorsBig(y) {
+            const arr = [y * 2n];
+            if (y > 1n && (y - 1n) % 3n === 0n) {
+                const x = (y - 1n) / 3n;
+                if (x % 2n === 1n && x > 0n) arr.push(x);
+            }
+            return arr;
+        }
+
+        function reverseCollatzLayered() {
+            const target = BigInt(document.getElementById('collatzStart').value);
+            const depth = parseInt(document.getElementById('collatzMax').value);
+            const result = document.getElementById('collatzResult');
+
+            if (target < 1n) { alert('请输入正整数！'); return; }
+            if (depth < 1 || depth > 50) { alert('层数必须在1-50之间！'); return; }
+
+            let out = '═══ 冰雹猜想逆推 (分层前驱) ═══\n\n';
+            out += '起点: ' + target.toString() + '\n';
+            out += '逆推层数: ' + depth + '\n\n';
+
+            let layer = new Set([target.toString()]);
+            let allLayers = [new Set([target.toString()])];
+
+            for (let d = 1; d <= depth; d++) {
+                const next = new Set();
+                for (const vStr of layer) {
+                    const v = BigInt(vStr);
+                    const preds = getPredecessorsBig(v);
+                    for (const p of preds) {
+                        if (p <= 1000000n) {
+                            next.add(p.toString());
+                        }
+                    }
+                }
+                layer = next;
+                allLayers.push(new Set(next));
+                if (next.size === 0) {
+                    out += '第' + d + '层: (空，无有效前驱)\n';
+                    break;
+                }
+                const sorted = [...next].map(s => BigInt(s)).sort((a,b) => a < b ? -1 : 1).map(s => s.toString());
+                if (sorted.length <= 30) {
+                    out += '第' + d + '层 (' + sorted.length + '个): ' + sorted.join(', ') + '\n';
+                } else {
+                    out += '第' + d + '层 (' + sorted.length + '个): ' + sorted.slice(0, 15).join(', ') + ' ... ' + sorted.slice(-15).join(', ') + '\n';
+                }
+            }
+
+            out += '\n═══ 可达 1 的最短路径 ═══\n';
+            let found = false;
+            for (let d = 0; d < allLayers.length; d++) {
+                if (allLayers[d].has('1')) {
+                    out += '在第 ' + d + ' 层找到 1\n';
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) out += '未找到 1 (需要更多层数)\n';
+
+            result.value = out;
+        }
+
+        function findMaxCollatz() {
+            const limit = parseInt(prompt('查找 1 到 N 之间，哪个起始数字产生的冰雹序列最长？\n请输入上限 N:', '10000'));
+            if (!limit || limit < 1) return;
+
+            const progress = document.getElementById('collatzResult');
+            progress.value = '正在计算 1 到 ' + limit + ' 的冰雹序列...\n';
+
+            let maxSteps = 0;
+            let maxStart = 1;
+
+            const memo = new Map();
+
+            for (let i = 1; i <= limit; i++) {
+                let n = BigInt(i);
+                let steps = 0;
+                const visited = [];
+
+                while (n !== 1n) {
+                    if (memo.has(n)) {
+                        steps += memo.get(n);
+                        break;
+                    }
+                    if (n % 2n === 0n) n = n / 2n;
+                    else n = 3n * n + 1n;
+                    steps++;
+                    visited.push([BigInt(i), steps]);
+                }
+
+                if (steps > maxSteps) {
+                    maxSteps = steps;
+                    maxStart = i;
+                }
+
+                for (const [num, step] of visited) {
+                    if (!memo.has(num)) memo.set(num, steps - step);
+                }
+            }
+
+            let output = '═══ 冰雹序列最长起点搜索 (1-' + limit + ') ═══\n\n';
+            output += '最长序列起始: ' + maxStart + '\n';
+            output += '序列长度: ' + maxSteps + ' 步\n\n';
+
+            const starts = [1, 5, 27, 97, 129, 271, 703, 999, 1818];
+            output += '著名起点对照:\n';
+            for (const s of starts) {
+                if (s <= limit) {
+                    let n = BigInt(s), st = 0;
+                    while (n !== 1n) {
+                        if (n % 2n === 0n) n = n / 2n;
+                        else n = 3n * n + 1n;
+                        st++;
+                    }
+                    output += '  起始 ' + String(s).padStart(5) + ': ' + st + ' 步\n';
+                }
+            }
+
+            progress.value = output;
+        }
+
+        const semaphorePositions = {
+            'A': [1, 2], 'B': [2, 3], 'C': [3, 4], 'D': [4, 5], 'E': [5, 6], 'F': [6, 7],
+            'G': [7, 8], 'H': [1, 8], 'I': [2, 7], 'J': [8, 6], 'K': [2, 1], 'L': [3, 2],
+            'M': [4, 3], 'N': [5, 4], 'O': [6, 5], 'P': [7, 6], 'Q': [8, 7], 'R': [1, 6],
+            'S': [2, 5], 'T': [3, 4], 'U': [8, 5], 'V': [4, 7], 'W': [2, 6], 'X': [5, 3],
+            'Y': [4, 2], 'Z': [3, 1], '0': [3, 5], '1': [1, 3], '2': [1, 4], '3': [1, 5],
+            '4': [1, 6], '5': [1, 7], '6': [1, 8], '7': [2, 3], '8': [2, 4], '9': [2, 5]
+        };
+
+        const positionAngles = {
+            0: -Math.PI / 2,
+            1: -Math.PI / 2, 2: -Math.PI / 4, 3: 0, 4: Math.PI / 4,
+            5: Math.PI / 2, 6: 3 * Math.PI / 4, 7: Math.PI, 8: -3 * Math.PI / 4
+        };
+
+        function textToSemaphore() {
+            const text = document.getElementById('semaphoreInput').value.toUpperCase();
+            if (!text.trim()) { alert('请输入文本！'); return; }
+            drawSemaphore(text);
+            let result = '旗语转换结果：\n\n';
+            for (let ch of text) {
+                if (ch === ' ') {
+                    result += '[空格] ';
+                } else if (semaphorePositions[ch]) {
+                    const pos = semaphorePositions[ch];
+                    result += ch + ': 右旗=' + pos[0] + ' 左旗=' + pos[1] + ' ';
+                } else {
+                    result += ch + ': [不支持] ';
+                }
+            }
+            document.getElementById('semaphoreResult').value = result.trim();
+            renderSemaphoreChart();
+        }
+
+        function semaphoreToText() {
+            const input = document.getElementById('semaphoreInput').value.trim();
+            if (!input) { alert('请输入旗语位置！'); return; }
+            const parts = input.split(/\s+/);
+            let result = '';
+            for (let part of parts) {
+                const nums = part.match(/\d+/g);
+                if (nums && nums.length >= 2) {
+                    const r = parseInt(nums[0]);
+                    const l = parseInt(nums[1]);
+                    const found = Object.entries(semaphorePositions).find(([_, v]) => v[0] === r && v[1] === l);
+                    if (found) result += found[0];
+                    else result += '?';
+                } else {
+                    result += part + ' ';
+                }
+            }
+            document.getElementById('semaphoreResult').value = '旗语解码结果：\n\n' + result;
+        }
+
+        function drawSemaphore(text) {
+            const canvas = document.getElementById('semaphoreCanvas');
+            const size = 300;
+            canvas.width = size;
+            canvas.height = size;
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            const chars = text.split('').filter(ch => semaphorePositions[ch]);
+            const perRow = Math.min(chars.length, 6);
+            const cellW = size / perRow;
+            const cellH = size / Math.ceil(chars.length / perRow);
+            chars.forEach((ch, idx) => {
+                const col = idx % perRow;
+                const row = Math.floor(idx / perRow);
+                const cx = col * cellW + cellW / 2;
+                const cy = row * cellH + cellH / 2;
+                drawSemaphoreCharacter(ctx, cx, cy, Math.min(cellW, cellH) * 0.4, ch);
+            });
+        }
+
+        function drawSemaphoreCharacter(ctx, cx, cy, scale, ch) {
+            const pos = semaphorePositions[ch];
+            if (!pos) return;
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(cx, cy - scale * 0.4, scale * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = scale * 0.04;
+            ctx.lineCap = 'round';
+            const shoulderY = cy - scale * 0.2;
+            const armLen = scale * 0.7;
+            const rightAngle = positionAngles[pos[0]] || -Math.PI / 2;
+            const leftAngle = positionAngles[pos[1]] || -Math.PI / 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, shoulderY);
+            ctx.lineTo(cx + Math.cos(rightAngle) * armLen, shoulderY + Math.sin(rightAngle) * armLen);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx, shoulderY);
+            ctx.lineTo(cx + Math.cos(leftAngle) * armLen, shoulderY + Math.sin(leftAngle) * armLen);
+            ctx.stroke();
+            const flagSize = scale * 0.25;
+            drawFlag(ctx, cx + Math.cos(rightAngle) * armLen, shoulderY + Math.sin(rightAngle) * armLen, rightAngle, flagSize, '#e74c3c');
+            drawFlag(ctx, cx + Math.cos(leftAngle) * armLen, shoulderY + Math.sin(leftAngle) * armLen, leftAngle, flagSize, '#3498db');
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold ' + (scale * 0.35) + 'px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(ch, cx, cy + scale * 0.8);
+        }
+
+        function drawFlag(ctx, x, y, angle, size, color) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(size * 0.3, 0);
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(size * 0.3, 0);
+            ctx.lineTo(size * 0.3 + size * 0.4, -size * 0.25);
+            ctx.lineTo(size * 0.3, -size * 0.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function renderSemaphoreChart() {
+            const chart = document.getElementById('semaphoreChart');
+            let html = '';
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (let ch of letters) {
+                const pos = semaphorePositions[ch];
+                if (pos) {
+                    html += '<div style="padding:4px;background:var(--bg);border-radius:6px;text-align:center;"><strong>' + ch + '</strong><br><span style="color:var(--text-secondary);font-size:0.7rem;">R' + pos[0] + ' L' + pos[1] + '</span></div>';
+                }
+            }
+            chart.innerHTML = html;
+        }
+
+        document.getElementById('pixelPasteArea').addEventListener('paste', handlePixelPaste);
+        document.getElementById('stegoPasteArea').addEventListener('paste', handleStegoPaste);
+
+        const periodicElements = [
+            {n:1,sym:'H',name:'氢',en:'Hydrogen',mass:1.008,period:1,group:1,cat:'alkali'},
+            {n:2,sym:'He',name:'氦',en:'Helium',mass:4.003,period:1,group:18,cat:'noble'},
+            {n:3,sym:'Li',name:'锂',en:'Lithium',mass:6.941,period:2,group:1,cat:'alkali'},
+            {n:4,sym:'Be',name:'铍',en:'Beryllium',mass:9.012,period:2,group:2,cat:'alkaline'},
+            {n:5,sym:'B',name:'硼',en:'Boron',mass:10.81,period:2,group:13,cat:'metalloid'},
+            {n:6,sym:'C',name:'碳',en:'Carbon',mass:12.01,period:2,group:14,cat:'nonmetal'},
+            {n:7,sym:'N',name:'氮',en:'Nitrogen',mass:14.01,period:2,group:15,cat:'nonmetal'},
+            {n:8,sym:'O',name:'氧',en:'Oxygen',mass:16.00,period:2,group:16,cat:'nonmetal'},
+            {n:9,sym:'F',name:'氟',en:'Fluorine',mass:19.00,period:2,group:17,cat:'halogen'},
+            {n:10,sym:'Ne',name:'氖',en:'Neon',mass:20.18,period:2,group:18,cat:'noble'},
+            {n:11,sym:'Na',name:'钠',en:'Sodium',mass:22.99,period:3,group:1,cat:'alkali'},
+            {n:12,sym:'Mg',name:'镁',en:'Magnesium',mass:24.31,period:3,group:2,cat:'alkaline'},
+            {n:13,sym:'Al',name:'铝',en:'Aluminium',mass:26.98,period:3,group:13,cat:'post'},
+            {n:14,sym:'Si',name:'硅',en:'Silicon',mass:28.09,period:3,group:14,cat:'metalloid'},
+            {n:15,sym:'P',name:'磷',en:'Phosphorus',mass:30.97,period:3,group:15,cat:'nonmetal'},
+            {n:16,sym:'S',name:'硫',en:'Sulfur',mass:32.07,period:3,group:16,cat:'nonmetal'},
+            {n:17,sym:'Cl',name:'氯',en:'Chlorine',mass:35.45,period:3,group:17,cat:'halogen'},
+            {n:18,sym:'Ar',name:'氩',en:'Argon',mass:39.95,period:3,group:18,cat:'noble'},
+            {n:19,sym:'K',name:'钾',en:'Potassium',mass:39.10,period:4,group:1,cat:'alkali'},
+            {n:20,sym:'Ca',name:'钙',en:'Calcium',mass:40.08,period:4,group:2,cat:'alkaline'},
+            {n:21,sym:'Sc',name:'钪',en:'Scandium',mass:44.96,period:4,group:3,cat:'transition'},
+            {n:22,sym:'Ti',name:'钛',en:'Titanium',mass:47.87,period:4,group:4,cat:'transition'},
+            {n:23,sym:'V',name:'钒',en:'Vanadium',mass:50.94,period:4,group:5,cat:'transition'},
+            {n:24,sym:'Cr',name:'铬',en:'Chromium',mass:52.00,period:4,group:6,cat:'transition'},
+            {n:25,sym:'Mn',name:'锰',en:'Manganese',mass:54.94,period:4,group:7,cat:'transition'},
+            {n:26,sym:'Fe',name:'铁',en:'Iron',mass:55.85,period:4,group:8,cat:'transition'},
+            {n:27,sym:'Co',name:'钴',en:'Cobalt',mass:58.93,period:4,group:9,cat:'transition'},
+            {n:28,sym:'Ni',name:'镍',en:'Nickel',mass:58.69,period:4,group:10,cat:'transition'},
+            {n:29,sym:'Cu',name:'铜',en:'Copper',mass:63.55,period:4,group:11,cat:'transition'},
+            {n:30,sym:'Zn',name:'锌',en:'Zinc',mass:65.38,period:4,group:12,cat:'transition'},
+            {n:31,sym:'Ga',name:'镓',en:'Gallium',mass:69.72,period:4,group:13,cat:'post'},
+            {n:32,sym:'Ge',name:'锗',en:'Germanium',mass:72.63,period:4,group:14,cat:'metalloid'},
+            {n:33,sym:'As',name:'砷',en:'Arsenic',mass:74.92,period:4,group:15,cat:'metalloid'},
+            {n:34,sym:'Se',name:'硒',en:'Selenium',mass:78.97,period:4,group:16,cat:'nonmetal'},
+            {n:35,sym:'Br',name:'溴',en:'Bromine',mass:79.90,period:4,group:17,cat:'halogen'},
+            {n:36,sym:'Kr',name:'氪',en:'Krypton',mass:83.80,period:4,group:18,cat:'noble'},
+            {n:37,sym:'Rb',name:'铷',en:'Rubidium',mass:85.47,period:5,group:1,cat:'alkali'},
+            {n:38,sym:'Sr',name:'锶',en:'Strontium',mass:87.62,period:5,group:2,cat:'alkaline'},
+            {n:39,sym:'Y',name:'钇',en:'Yttrium',mass:88.91,period:5,group:3,cat:'transition'},
+            {n:40,sym:'Zr',name:'锆',en:'Zirconium',mass:91.22,period:5,group:4,cat:'transition'},
+            {n:41,sym:'Nb',name:'铌',en:'Niobium',mass:92.91,period:5,group:5,cat:'transition'},
+            {n:42,sym:'Mo',name:'钼',en:'Molybdenum',mass:95.95,period:5,group:6,cat:'transition'},
+            {n:43,sym:'Tc',name:'锝',en:'Technetium',mass:98,period:5,group:7,cat:'transition'},
+            {n:44,sym:'Ru',name:'钌',en:'Ruthenium',mass:101.1,period:5,group:8,cat:'transition'},
+            {n:45,sym:'Rh',name:'铑',en:'Rhodium',mass:102.9,period:5,group:9,cat:'transition'},
+            {n:46,sym:'Pd',name:'钯',en:'Palladium',mass:106.4,period:5,group:10,cat:'transition'},
+            {n:47,sym:'Ag',name:'银',en:'Silver',mass:107.9,period:5,group:11,cat:'transition'},
+            {n:48,sym:'Cd',name:'镉',en:'Cadmium',mass:112.4,period:5,group:12,cat:'transition'},
+            {n:49,sym:'In',name:'铟',en:'Indium',mass:114.8,period:5,group:13,cat:'post'},
+            {n:50,sym:'Sn',name:'锡',en:'Tin',mass:118.7,period:5,group:14,cat:'post'},
+            {n:51,sym:'Sb',name:'锑',en:'Antimony',mass:121.8,period:5,group:15,cat:'metalloid'},
+            {n:52,sym:'Te',name:'碲',en:'Tellurium',mass:127.6,period:5,group:16,cat:'metalloid'},
+            {n:53,sym:'I',name:'碘',en:'Iodine',mass:126.9,period:5,group:17,cat:'halogen'},
+            {n:54,sym:'Xe',name:'氙',en:'Xenon',mass:131.3,period:5,group:18,cat:'noble'},
+            {n:55,sym:'Cs',name:'铯',en:'Caesium',mass:132.9,period:6,group:1,cat:'alkali'},
+            {n:56,sym:'Ba',name:'钡',en:'Barium',mass:137.3,period:6,group:2,cat:'alkaline'},
+            {n:57,sym:'La',name:'镧',en:'Lanthanum',mass:138.9,period:6,group:3,cat:'lanthanide'},
+            {n:58,sym:'Ce',name:'铈',en:'Cerium',mass:140.1,period:6,group:0,cat:'lanthanide'},
+            {n:59,sym:'Pr',name:'镨',en:'Praseodymium',mass:140.9,period:6,group:0,cat:'lanthanide'},
+            {n:60,sym:'Nd',name:'钕',en:'Neodymium',mass:144.2,period:6,group:0,cat:'lanthanide'},
+            {n:61,sym:'Pm',name:'钷',en:'Promethium',mass:145,period:6,group:0,cat:'lanthanide'},
+            {n:62,sym:'Sm',name:'钐',en:'Samarium',mass:150.4,period:6,group:0,cat:'lanthanide'},
+            {n:63,sym:'Eu',name:'铕',en:'Europium',mass:152.0,period:6,group:0,cat:'lanthanide'},
+            {n:64,sym:'Gd',name:'钆',en:'Gadolinium',mass:157.3,period:6,group:0,cat:'lanthanide'},
+            {n:65,sym:'Tb',name:'铽',en:'Terbium',mass:158.9,period:6,group:0,cat:'lanthanide'},
+            {n:66,sym:'Dy',name:'镝',en:'Dysprosium',mass:162.5,period:6,group:0,cat:'lanthanide'},
+            {n:67,sym:'Ho',name:'钬',en:'Holmium',mass:164.9,period:6,group:0,cat:'lanthanide'},
+            {n:68,sym:'Er',name:'铒',en:'Erbium',mass:167.3,period:6,group:0,cat:'lanthanide'},
+            {n:69,sym:'Tm',name:'铥',en:'Thulium',mass:168.9,period:6,group:0,cat:'lanthanide'},
+            {n:70,sym:'Yb',name:'镱',en:'Ytterbium',mass:173.0,period:6,group:0,cat:'lanthanide'},
+            {n:71,sym:'Lu',name:'镥',en:'Lutetium',mass:175.0,period:6,group:0,cat:'lanthanide'},
+            {n:72,sym:'Hf',name:'铪',en:'Hafnium',mass:178.5,period:6,group:4,cat:'transition'},
+            {n:73,sym:'Ta',name:'钽',en:'Tantalum',mass:180.9,period:6,group:5,cat:'transition'},
+            {n:74,sym:'W',name:'钨',en:'Tungsten',mass:183.8,period:6,group:6,cat:'transition'},
+            {n:75,sym:'Re',name:'铼',en:'Rhenium',mass:186.2,period:6,group:7,cat:'transition'},
+            {n:76,sym:'Os',name:'锇',en:'Osmium',mass:190.2,period:6,group:8,cat:'transition'},
+            {n:77,sym:'Ir',name:'铱',en:'Iridium',mass:192.2,period:6,group:9,cat:'transition'},
+            {n:78,sym:'Pt',name:'铂',en:'Platinum',mass:195.1,period:6,group:10,cat:'transition'},
+            {n:79,sym:'Au',name:'金',en:'Gold',mass:197.0,period:6,group:11,cat:'transition'},
+            {n:80,sym:'Hg',name:'汞',en:'Mercury',mass:200.6,period:6,group:12,cat:'transition'},
+            {n:81,sym:'Tl',name:'铊',en:'Thallium',mass:204.4,period:6,group:13,cat:'post'},
+            {n:82,sym:'Pb',name:'铅',en:'Lead',mass:207.2,period:6,group:14,cat:'post'},
+            {n:83,sym:'Bi',name:'铋',en:'Bismuth',mass:209.0,period:6,group:15,cat:'post'},
+            {n:84,sym:'Po',name:'钋',en:'Polonium',mass:209,period:6,group:16,cat:'post'},
+            {n:85,sym:'At',name:'砹',en:'Astatine',mass:210,period:6,group:17,cat:'halogen'},
+            {n:86,sym:'Rn',name:'氡',en:'Radon',mass:222,period:6,group:18,cat:'noble'},
+            {n:87,sym:'Fr',name:'钫',en:'Francium',mass:223,period:7,group:1,cat:'alkali'},
+            {n:88,sym:'Ra',name:'镭',en:'Radium',mass:226,period:7,group:2,cat:'alkaline'},
+            {n:89,sym:'Ac',name:'锕',en:'Actinium',mass:227,period:7,group:3,cat:'actinide'},
+            {n:90,sym:'Th',name:'钍',en:'Thorium',mass:232.0,period:7,group:0,cat:'actinide'},
+            {n:91,sym:'Pa',name:'镤',en:'Protactinium',mass:231.0,period:7,group:0,cat:'actinide'},
+            {n:92,sym:'U',name:'铀',en:'Uranium',mass:238.0,period:7,group:0,cat:'actinide'},
+            {n:93,sym:'Np',name:'镎',en:'Neptunium',mass:237,period:7,group:0,cat:'actinide'},
+            {n:94,sym:'Pu',name:'钚',en:'Plutonium',mass:244,period:7,group:0,cat:'actinide'},
+            {n:95,sym:'Am',name:'镅',en:'Americium',mass:243,period:7,group:0,cat:'actinide'},
+            {n:96,sym:'Cm',name:'锔',en:'Curium',mass:247,period:7,group:0,cat:'actinide'},
+            {n:97,sym:'Bk',name:'锫',en:'Berkelium',mass:247,period:7,group:0,cat:'actinide'},
+            {n:98,sym:'Cf',name:'锎',en:'Californium',mass:251,period:7,group:0,cat:'actinide'},
+            {n:99,sym:'Es',name:'锿',en:'Einsteinium',mass:252,period:7,group:0,cat:'actinide'},
+            {n:100,sym:'Fm',name:'镄',en:'Fermium',mass:257,period:7,group:0,cat:'actinide'},
+            {n:101,sym:'Md',name:'钔',en:'Mendelevium',mass:258,period:7,group:0,cat:'actinide'},
+            {n:102,sym:'No',name:'锘',en:'Nobelium',mass:259,period:7,group:0,cat:'actinide'},
+            {n:103,sym:'Lr',name:'铹',en:'Lawrencium',mass:266,period:7,group:0,cat:'actinide'},
+            {n:104,sym:'Rf',name:'𬬻',en:'Rutherfordium',mass:267,period:7,group:4,cat:'transition'},
+            {n:105,sym:'Db',name:'𬭊',en:'Dubnium',mass:268,period:7,group:5,cat:'transition'},
+            {n:106,sym:'Sg',name:'𬭳',en:'Seaborgium',mass:269,period:7,group:6,cat:'transition'},
+            {n:107,sym:'Bh',name:'𬭛',en:'Bohrium',mass:270,period:7,group:7,cat:'transition'},
+            {n:108,sym:'Hs',name:'𬭶',en:'Hassium',mass:269,period:7,group:8,cat:'transition'},
+            {n:109,sym:'Mt',name:'鿏',en:'Meitnerium',mass:278,period:7,group:9,cat:'transition'},
+            {n:110,sym:'Ds',name:'𫟼',en:'Darmstadtium',mass:281,period:7,group:10,cat:'transition'},
+            {n:111,sym:'Rg',name:'𬬭',en:'Roentgenium',mass:282,period:7,group:11,cat:'transition'},
+            {n:112,sym:'Cn',name:'鿔',en:'Copernicium',mass:285,period:7,group:12,cat:'transition'},
+            {n:113,sym:'Nh',name:'鿭',en:'Nihonium',mass:286,period:7,group:13,cat:'post'},
+            {n:114,sym:'Fl',name:'𫓧',en:'Flerovium',mass:289,period:7,group:14,cat:'post'},
+            {n:115,sym:'Mc',name:'镆',en:'Moscovium',mass:290,period:7,group:15,cat:'post'},
+            {n:116,sym:'Lv',name:'𫟷',en:'Livermorium',mass:293,period:7,group:16,cat:'post'},
+            {n:117,sym:'Ts',name:'鿬',en:'Tennessine',mass:294,period:7,group:17,cat:'halogen'},
+            {n:118,sym:'Og',name:'鿫',en:'Oganesson',mass:294,period:7,group:18,cat:'noble'}
+        ];
+
+        const catNames = {
+            alkali:'碱金属', alkaline:'碱土金属', transition:'过渡金属', post:'后过渡金属',
+            metalloid:'类金属', nonmetal:'非金属', halogen:'卤素', noble:'稀有气体',
+            lanthanide:'镧系元素', actinide:'锕系元素'
+        };
+
+        let periodicTableBuilt = false;
+
+        function buildPeriodicTable() {
+            if (periodicTableBuilt) return;
+            periodicTableBuilt = true;
+            const table = document.getElementById('periodicTable');
+            let html = '';
+            for (let p = 1; p <= 7; p++) {
+                html += '<div class="pt-row">';
+                for (let g = 1; g <= 18; g++) {
+                    const el = periodicElements.find(e => e.period === p && e.group === g);
+                    if (el) {
+                        html += '<div class="pt-cell cat-' + el.cat + '" data-n="' + el.n + '" onclick="showElementDetail(' + el.n + ')">';
+                        html += '<span class="pt-num">' + el.n + '</span>';
+                        html += '<span class="pt-sym">' + el.sym + '</span>';
+                        html += '<span class="pt-name">' + el.name + '</span>';
+                        html += '</div>';
+                    } else if (p === 6 && g === 3) {
+                        html += '<div class="pt-cell cat-lanthanide pt-placeholder" onclick="scrollToLanthanides()">';
+                        html += '<span class="pt-num">57-71</span>';
+                        html += '<span class="pt-sym">镧系</span>';
+                        html += '</div>';
+                    } else if (p === 7 && g === 3) {
+                        html += '<div class="pt-cell cat-actinide pt-placeholder" onclick="scrollToActinides()">';
+                        html += '<span class="pt-num">89-103</span>';
+                        html += '<span class="pt-sym">锕系</span>';
+                        html += '</div>';
+                    } else {
+                        html += '<div class="pt-cell pt-empty"></div>';
+                    }
+                }
+                html += '</div>';
+            }
+            html += '<div class="pt-gap"></div>';
+            html += '<div class="pt-row pt-lanth-row">';
+            html += '<div class="pt-cell pt-empty pt-label">镧系</div>';
+            for (let n = 57; n <= 71; n++) {
+                const el = periodicElements.find(e => e.n === n);
+                html += '<div class="pt-cell cat-lanthanide" data-n="' + n + '" onclick="showElementDetail(' + n + ')">';
+                html += '<span class="pt-num">' + el.n + '</span>';
+                html += '<span class="pt-sym">' + el.sym + '</span>';
+                html += '<span class="pt-name">' + el.name + '</span>';
+                html += '</div>';
+            }
+            for (let i = 0; i < 4; i++) html += '<div class="pt-cell pt-empty"></div>';
+            html += '</div>';
+            html += '<div class="pt-row pt-act-row">';
+            html += '<div class="pt-cell pt-empty pt-label">锕系</div>';
+            for (let n = 89; n <= 103; n++) {
+                const el = periodicElements.find(e => e.n === n);
+                html += '<div class="pt-cell cat-actinide" data-n="' + n + '" onclick="showElementDetail(' + n + ')">';
+                html += '<span class="pt-num">' + el.n + '</span>';
+                html += '<span class="pt-sym">' + el.sym + '</span>';
+                html += '<span class="pt-name">' + el.name + '</span>';
+                html += '</div>';
+            }
+            for (let i = 0; i < 4; i++) html += '<div class="pt-cell pt-empty"></div>';
+            html += '</div>';
+            table.innerHTML = html;
+        }
+
+        function showElementDetail(n) {
+            const el = periodicElements.find(e => e.n === n);
+            if (!el) return;
+            document.getElementById('periodicDetailTitle').textContent = el.sym + ' ' + el.name + ' (' + el.en + ')';
+            const content = document.getElementById('periodicDetailContent');
+            content.innerHTML =
+                '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:0.85rem;">' +
+                '<div><strong>原子序数：</strong>' + el.n + '</div>' +
+                '<div><strong>元素符号：</strong>' + el.sym + '</div>' +
+                '<div><strong>中文名称：</strong>' + el.name + '</div>' +
+                '<div><strong>英文名称：</strong>' + el.en + '</div>' +
+                '<div><strong>相对原子质量：</strong>' + el.mass + '</div>' +
+                '<div><strong>周期：</strong>第' + el.period + '周期</div>' +
+                '<div><strong>族：</strong>' + (el.group > 0 ? '第' + el.group + '族' : el.cat === 'lanthanide' ? '镧系' : '锕系') + '</div>' +
+                '<div><strong>类别：</strong>' + (catNames[el.cat] || el.cat) + '</div>' +
+                '</div>';
+            document.getElementById('periodicDetail').style.display = 'block';
+            document.querySelectorAll('.pt-cell').forEach(c => c.classList.remove('pt-active'));
+            const cell = document.querySelector('.pt-cell[data-n="' + n + '"]');
+            if (cell) cell.classList.add('pt-active');
+        }
+
+        document.getElementById('periodicSearch').addEventListener('input', function(e) {
+            const q = e.target.value.trim().toLowerCase();
+            if (!periodicTableBuilt) buildPeriodicTable();
+            if (!q) {
+                document.querySelectorAll('.pt-cell').forEach(c => c.classList.remove('pt-hidden', 'pt-highlight'));
+                document.getElementById('periodicDetail').style.display = 'none';
+                return;
+            }
+            document.querySelectorAll('.pt-cell').forEach(c => c.classList.add('pt-hidden'));
+            const matches = periodicElements.filter(el =>
+                el.name.includes(q) ||
+                el.sym.toLowerCase() === q ||
+                el.sym.toLowerCase().startsWith(q) ||
+                el.en.toLowerCase().includes(q) ||
+                String(el.n) === q
+            );
+            matches.forEach(el => {
+                const cell = document.querySelector('.pt-cell[data-n="' + el.n + '"]');
+                if (cell) cell.classList.remove('pt-hidden');
+            });
+            if (matches.length === 1) {
+                showElementDetail(matches[0].n);
+            } else {
+                document.getElementById('periodicDetail').style.display = 'none';
+            }
+        });
+
+        function scrollToLanthanides() {
+            document.querySelector('.pt-lanth-row').scrollIntoView({behavior:'smooth', block:'center'});
+        }
+        function scrollToActinides() {
+            document.querySelector('.pt-act-row').scrollIntoView({behavior:'smooth', block:'center'});
+        }
+
+        function showPeriodicTab(tab) {
+            document.getElementById('periodicTabTable').style.display = tab === 'table' ? 'block' : 'none';
+            document.getElementById('periodicTabFusion').style.display = tab === 'fusion' ? 'block' : 'none';
+            document.getElementById('periodicTabFission').style.display = tab === 'fission' ? 'block' : 'none';
+            if (tab === 'fusion' && !fusionBuilt) buildFusionTable();
+            if (tab === 'fission' && !fissionBuilt) buildFissionTable();
+        }
+
+        const fusionReactions = [
+            { reactants: ['¹H', '¹H'], product: '²H + e⁺ + νₑ', note: '质子-质子链第1步（恒星主序）' },
+            { reactants: ['¹H', '¹H'], product: '²H + γ', note: '氘核生成' },
+            { reactants: ['¹H', '²H'], product: '³He + γ', note: '质子-氘反应' },
+            { reactants: ['²H', '²H'], product: '³He + n', note: '氘-氘聚变分支1' },
+            { reactants: ['²H', '²H'], product: '³H + ¹H', note: '氘-氘聚变分支2' },
+            { reactants: ['¹H', '³He'], product: '⁴He + e⁺ + νₑ', note: '质子-质子链第2步' },
+            { reactants: ['²H', '³H'], product: '⁴He + n + 17.6MeV', note: '氘-氚聚变（最易实现）' },
+            { reactants: ['²H', '³He'], product: '⁴He + ¹H + 18.3MeV', note: '氘-氦3聚变' },
+            { reactants: ['³He', '³He'], product: '⁴He + 2¹H + 12.9MeV', note: '氦3-氦3聚变' },
+            { reactants: ['⁴He', '⁴He'], product: '⁸Be + 91.8keV', note: '三α过程第1步（铍不稳定）' },
+            { reactants: ['⁸Be', '⁴He'], product: '¹²C + 7.275MeV', note: '三α过程第2步（霍伊尔共振态）' },
+            { reactants: ['¹²C', '⁴He'], product: '¹⁶O + 7.162MeV', note: '氦燃烧第1步' },
+            { reactants: ['¹⁶O', '⁴He'], product: '²⁰Ne + 4.730MeV', note: '氦燃烧第2步' },
+            { reactants: ['²⁰Ne', '⁴He'], product: '²⁴Mg + 9.317MeV', note: '氦燃烧第3步' },
+            { reactants: ['²⁴Mg', '⁴He'], product: '²⁸Si + 6.793MeV', note: '氦燃烧第4步' },
+            { reactants: ['²⁸Si', '⁴He'], product: '³²S + 6.948MeV', note: '氦燃烧第5步' },
+            { reactants: ['³²S', '⁴He'], product: '³⁶Ar + 6.641MeV', note: '氦燃烧第6步' },
+            { reactants: ['³⁶Ar', '⁴He'], product: '⁴⁰Ca + 7.040MeV', note: '氦燃烧第7步' },
+            { reactants: ['⁴⁰Ca', '⁴He'], product: '⁴⁴Ti + 5.127MeV', note: '氦燃烧第8步' },
+            { reactants: ['⁴⁴Ti', '⁴He'], product: '⁴⁸Cr + 7.694MeV', note: '氦燃烧第9步' },
+            { reactants: ['⁴⁸Cr', '⁴He'], product: '⁵²Fe + 7.937MeV', note: '氦燃烧第10步（到铁）' },
+            { reactants: ['¹²C', '¹²C'], product: '²⁴Mg + γ + 16.76MeV', note: '碳聚变（碳烧期）' },
+            { reactants: ['¹²C', '¹⁶O'], product: '²⁸Si + γ + 16.75MeV', note: '碳-氧聚变' },
+            { reactants: ['¹⁶O', '¹⁶O'], product: '³²S + γ + 16.54MeV', note: '氧聚变（氧烧期）' },
+            { reactants: ['¹⁶O', '²⁰Ne'], product: '³⁶Ar + 16.72MeV', note: '氧-氖聚变' },
+            { reactants: ['¹⁶O', '²⁴Mg'], product: '⁴⁰Ca + 17.28MeV', note: '氧-镁聚变' },
+            { reactants: ['¹⁶O', '²⁸Si'], product: '⁴⁴Ti + 17.53MeV', note: '氧-硅聚变' },
+            { reactants: ['¹⁶O', '³²S'], product: '⁴⁸Cr + 18.07MeV', note: '氧-硫聚变' },
+            { reactants: ['¹⁶O', '³⁶Ar'], product: '⁵²Fe + 18.34MeV', note: '氧-氩聚变（到铁）' },
+            { reactants: ['¹⁶O', '⁴⁰Ca'], product: '⁵⁶Ni + 19.04MeV', note: '氧-钙聚变（到镍，超新星）' },
+            { reactants: ['²⁰Ne', '²⁰Ne'], product: '⁴⁰Ca + γ + 27.72MeV', note: '氖聚变' },
+            { reactants: ['²⁰Ne', '²⁴Mg'], product: '⁴⁴Ti + 28.26MeV', note: '氖-镁聚变' },
+            { reactants: ['²⁰Ne', '²⁸Si'], product: '⁴⁸Cr + 28.88MeV', note: '氖-硅聚变' },
+            { reactants: ['²⁰Ne', '³²S'], product: '⁵²Fe + 29.50MeV', note: '氖-硫聚变（到铁）' },
+            { reactants: ['²⁴Mg', '²⁴Mg'], product: '⁴⁸Cr + γ + 28.60MeV', note: '镁聚变' },
+            { reactants: ['²⁴Mg', '²⁸Si'], product: '⁵²Fe + γ + 29.31MeV', note: '镁-硅聚变（到铁）' },
+            { reactants: ['²⁸Si', '²⁸Si'], product: '⁵⁶Ni + γ + 30.49MeV', note: '硅聚变（铁峰元素）' },
+            { reactants: ['¹H', '¹²C'], product: '¹³N + γ', note: 'CNO循环：¹²C(p,γ)¹³N' },
+            { reactants: ['¹³N'], product: '¹³C + e⁺ + νₑ', note: 'CNO循环：¹³N β⁺衰变' },
+            { reactants: ['¹H', '¹³C'], product: '¹⁴N + γ', note: 'CNO循环：¹³C(p,γ)¹⁴N' },
+            { reactants: ['¹H', '¹⁴N'], product: '¹⁵O + γ', note: 'CNO循环：¹⁴N(p,γ)¹⁵O' },
+            { reactants: ['¹⁵O'], product: '¹⁵N + e⁺ + νₑ', note: 'CNO循环：¹⁵O β⁺衰变' },
+            { reactants: ['¹H', '¹⁵N'], product: '¹²C + ⁴He', note: 'CNO循环：¹⁵N(p,α)¹²C' },
+            { reactants: ['⁵⁶Ni'], product: '⁵⁶Co + e⁺ + νₑ', note: '超新星：镍56→钴56（β⁺衰变）' },
+            { reactants: ['⁵⁶Co'], product: '⁵⁶Fe + e⁺ + νₑ', note: '超新星：钴56→铁56（β⁺衰变，光变曲线）' },
+        ];
+
+        const fissionReactions = [
+            { reactants: ['²³⁵U', 'n'], product: '⁹²Kr + ¹⁴¹Ba + 3n', note: '铀235裂变（经典反应）' },
+            { reactants: ['²³⁵U', 'n'], product: '⁹⁵Sr + ¹³⁹Xe + 2n', note: '铀235裂变分支' },
+            { reactants: ['²³⁵U', 'n'], product: '¹⁰³Zr + ¹³¹Te + 2n', note: '铀235裂变产物' },
+            { reactants: ['²³⁹Pu', 'n'], product: '⁹⁶Sr + ¹⁴¹Ba + 3n', note: '钚239裂变' },
+            { reactants: ['²³⁹Pu', 'n'], product: '¹⁰³Mo + ¹³⁴Te + 3n', note: '钚239裂变分支' },
+            { reactants: ['²³³U', 'n'], product: '⁹⁵Y + ¹³⁷I + 2n', note: '铀233裂变（钍燃料）' },
+            { reactants: ['²³⁸U', 'n'], product: '²³⁹Np + β⁻', note: '铀238俘获中子（钚生产）' },
+            { reactants: ['²³²Th', 'n'], product: '²³³U + 2β⁻', note: '钍232→铀233（钍循环）' },
+            { reactants: ['²³⁵U'], product: '²³¹Th + α', note: '铀235 α衰变（半衰期7亿年）' },
+            { reactants: ['²³⁸U'], product: '²³⁴Th + α', note: '铀238 α衰变（半衰期45亿年）' },
+            { reactants: ['²³⁹Pu'], product: '²³⁵U + α', note: '钚239 α衰变（半衰期2.4万年）' },
+            { reactants: ['²¹⁰Po'], product: '²⁰⁶Pb + α', note: '钋210 α衰变（半衰期138天）' },
+            { reactants: ['¹⁴C'], product: '¹⁴N + β⁻', note: '碳14 β衰变（半衰期5730年，考古测年）' },
+            { reactants: ['⁶⁰Co'], product: '⁶⁰Ni + β⁻ + γ', note: '钴60 β+γ衰变（放射源）' },
+            { reactants: ['¹³⁷Cs'], product: '¹³⁷Ba + β⁻ + γ', note: '铯137 β衰变（半衰期30年）' },
+            { reactants: ['⁹⁰Sr'], product: '⁹⁰Y + β⁻', note: '锶90 β衰变（半衰期29年）' },
+        ];
+
+        let fusionBuilt = false;
+        let fissionBuilt = false;
+
+        function buildFusionTable() {
+            fusionBuilt = true;
+            const table = document.getElementById('fusionTable');
+            table.innerHTML = fusionReactions.map(r => {
+                const eq = r.reactants.join(' + ') + ' → ' + r.product;
+                return `<div style="padding:10px 16px;background:var(--accent-glow);border-radius:8px;text-align:center;font-family:serif;font-size:1.05rem;">
+                    <div style="font-weight:600;">${eq}</div>
+                    <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:4px;">${r.note}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function buildFissionTable() {
+            fissionBuilt = true;
+            const table = document.getElementById('fissionTable');
+            table.innerHTML = fissionReactions.map(r => {
+                const eq = r.reactants.join(' + ') + ' → ' + r.product;
+                return `<div style="padding:10px 16px;background:var(--accent-glow);border-radius:8px;text-align:center;font-family:serif;font-size:1.05rem;">
+                    <div style="font-weight:600;">${eq}</div>
+                    <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:4px;">${r.note}</div>
+                </div>`;
+            }).join('');
+        }
+
+        const _origOpenPeriodic = openModal;
+        const _ptModalListener = setInterval(() => {
+            if (typeof openModal === 'function') {
+                clearInterval(_ptModalListener);
+                const _orig = openModal;
+                window.openModal = function(id) {
+                    _orig(id);
+                    if (id === 'periodic') {
+                        setTimeout(buildPeriodicTable, 50);
+                    }
+                };
+            }
+        }, 50);
+    </script>
+</body>
+</html>
