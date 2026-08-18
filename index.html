@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AKKM团队 - Puzzle Hunt工具箱</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <style>
         :root {
             --bg: #f5f5f5;
@@ -198,6 +201,7 @@
             <div class="tool-card" data-category="other" data-modal="dropquote"><div class="tool-icon other">✒️</div><h3>落墨求解器</h3><p>Dropquotes谜题求解工具，帮助解开下落字母谜题。</p><div class="tool-tags"><span class="tool-tag">落墨</span><span class="tool-tag">谜题</span><span class="tool-tag">求解</span></div></div>
             <div class="tool-card" data-category="other" data-modal="undertale"><div class="tool-icon other">🎮</div><h3>Undertale彩色砖块</h3><p>Undertale彩色砖块谜题求解器，帮助通过砖块房间。</p><div class="tool-tags"><span class="tool-tag">Undertale</span><span class="tool-tag">砖块</span><span class="tool-tag">解谜</span></div></div>
             <div class="tool-card" data-category="logic" data-modal="baseconv"><div class="tool-icon logic">🔢</div><h3>多进制转换</h3><p>二进制、三进制、十六进制、A1Z26、康托展开互转。</p><div class="tool-tags"><span class="tool-tag">进制</span><span class="tool-tag">A1Z26</span><span class="tool-tag">康托</span></div></div>
+            <div class="tool-card" data-category="other" data-modal="latex"><div class="tool-icon other">📝</div><h3>LaTeX公式</h3><p>输入LaTeX表达式，实时渲染数学公式。</p><div class="tool-tags"><span class="tool-tag">LaTeX</span><span class="tool-tag">数学</span><span class="tool-tag">公式</span></div></div>
         </div>
 
         <section class="links-section">
@@ -291,10 +295,6 @@
                     <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank" class="link-card"><span class="link-icon">🧬</span><span class="link-name">BLAST</span><span class="link-desc">DNA序列</span></a>
                 </div>
             </div>
-            <div style="margin-top:16px;">
-    <h4 style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:8px;">对照表</h4>
-    <img src="https://pnku3.pkupuzzle.art/mion/images/cals_sheet.webp" style="width:100%;border-radius:10px;border:1px solid var(--border);" alt="CALS解谜字母对照表">
-</div>
         </section>
     </main>
 
@@ -361,6 +361,33 @@ Z映射到55</textarea></div></div>
                     <div class="result-box"><h4>转换结果 <button class="copy-btn" onclick="copyResult('bcResult')">📋</button></h4><textarea id="bcResult" readonly style="min-height:180px;"></textarea></div>
                     <div id="bcChart" style="margin-top:12px;"></div>
                 </div>
+                <div class="tool-panel" id="panel-latex">
+                    <div class="input-group"><label>LaTeX 表达式</label><textarea id="latexInput" placeholder="输入 LaTeX 表达式，例如：&#10;\frac{a}{b} = \frac{c}{d}&#10;\sum_{i=1}^{n} i^2 = \frac{n(n+1)(2n+1)}{6}&#10;e^{i\pi} + 1 = 0" rows="4" oninput="renderLatex()"></textarea></div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="renderLatex()">📐 渲染公式</button>
+                        <button class="btn btn-secondary" onclick="latexExample('quadratic')">📋 二次公式</button>
+                        <button class="btn btn-secondary" onclick="latexExample('euler')">📋 欧拉恒等式</button>
+                        <button class="btn btn-secondary" onclick="latexExample('matrix')">📋 矩阵</button>
+                        <button class="btn btn-secondary" onclick="latexExample('integral')">📋 积分</button>
+                        <button class="btn btn-secondary" onclick="latexExample('sum')">📋 求和</button>
+                    </div>
+                    <div class="result-box" style="min-height:120px;display:flex;align-items:center;justify-content:center;padding:24px;">
+                        <div id="latexOutput" style="font-size:1.4rem;text-align:center;width:100%;overflow-x:auto;"></div>
+                    </div>
+                    <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;font-size:0.8rem;color:var(--text-secondary);">
+                        <strong>💡 常用语法：</strong>
+                        <div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                            <span>\frac{a}{b} → 分数</span><span>\sqrt{x} → 根号</span>
+                            <span>x^{n} → 上标</span><span>x_{n} → 下标</span>
+                            <span>\sum_{i=1}^{n} → 求和</span><span>\int_{a}^{b} → 积分</span>
+                            <span>\begin{matrix}...\end{matrix} → 矩阵</span><span>\binom{n}{k} → 组合数</span>
+                            <span>\lim_{x\to 0} → 极限</span><span>\partial → 偏导</span>
+                            <span>\infty → 无穷</span><span>\pm, \times, \div → 运算符</span>
+                            <span>\alpha, \beta, \gamma → 希腊字母</span><span>\mathbb{R} → 实数集</span>
+                            <span>\overline{AB} → 上划线</span><span>\vec{a} → 向量</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -382,7 +409,7 @@ Z映射到55</textarea></div></div>
             'maze': '🏃 迷宫求解器', 'nato': '🔊 NATO音标',
             'braille': '👁️ 盲文转换器', 'base64': '📦 Base64编解码', 'railfence': '🔒 栅栏密码', 'bacon': '📝 培根密码',
             'polybius': '🔢 波利比乌斯棋盘', 'affine': '📐 仿射密码',
-            'calendar': '📅 中国历法', 'ringtext': '⭕ 圆环文字', 'emoji': '😊 Emoji大全', 'dropquote': '✒️ 落墨求解器', 'undertale': '🎮 Undertale彩色砖块', 'baseconv': '🔢 多进制转换'
+            'calendar': '📅 中国历法', 'ringtext': '⭕ 圆环文字', 'emoji': '😊 Emoji大全', 'dropquote': '✒️ 落墨求解器', 'undertale': '🎮 Undertale彩色砖块', 'baseconv': '🔢 多进制转换', 'latex': '📝 LaTeX公式'
         };
         document.querySelectorAll('.tool-card').forEach(c => {
             c.addEventListener('click', () => {
@@ -2038,6 +2065,30 @@ Z映射到55</textarea></div></div>
             }
             html += '</div>';
             chart.innerHTML = html;
+        }
+
+        const latexExamples = {
+            quadratic: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+            euler: 'e^{i\\pi} + 1 = 0',
+            matrix: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\begin{pmatrix} ax + by \\\\ cx + dy \\end{pmatrix}',
+            integral: '\\int_{0}^{\\infty} e^{-x^2} \\, dx = \\frac{\\sqrt{\\pi}}{2}',
+            sum: '\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}'
+        };
+
+        function latexExample(key) {
+            document.getElementById('latexInput').value = latexExamples[key];
+            renderLatex();
+        }
+
+        function renderLatex() {
+            const input = document.getElementById('latexInput').value.trim();
+            const output = document.getElementById('latexOutput');
+            if (!input) { output.innerHTML = '<span style="color:var(--text-secondary);font-size:0.9rem;">输入 LaTeX 表达式以渲染公式</span>'; return; }
+            try {
+                katex.render(input, output, { throwOnError: false, displayMode: true, errorColor: '#ef4444' });
+            } catch (e) {
+                output.innerHTML = '<span style="color:#ef4444;font-size:0.9rem;">渲染错误：' + e.message + '</span>';
+            }
         }
 
         applyTheme(getTheme());
