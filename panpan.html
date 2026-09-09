@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>泮泮 - 你的数智校园好友</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #8B95FF 0%, #A5AEFF 100%);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* 云朵装饰 */
+  .cloud {
+    position: absolute;
+    background: rgba(255,255,255,0.25);
+    border-radius: 100px;
+    filter: blur(2px);
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+  }
+  .cloud1 {
+    width: 160px; height: 50px;
+    top: 12%; left: 18%;
+  }
+  .cloud1::before { width: 70px; height: 70px; top: -35px; left: 30px; }
+  .cloud1::after { width: 50px; height: 50px; top: -20px; right: 20px; }
+
+  .cloud2 {
+    width: 200px; height: 60px;
+    bottom: 8%; left: 5%;
+  }
+  .cloud2::before { width: 90px; height: 90px; top: -45px; left: 40px; }
+  .cloud2::after { width: 60px; height: 60px; top: -25px; right: 30px; }
+
+  .cloud3 {
+    width: 180px; height: 55px;
+    top: 45%; right: 6%;
+  }
+  .cloud3::before { width: 80px; height: 80px; top: -40px; left: 35px; }
+  .cloud3::after { width: 55px; height: 55px; top: -22px; right: 25px; }
+
+  /* 登录卡片 */
+  .login-card {
+    position: relative;
+    z-index: 10;
+    width: 420px;
+    max-width: 92vw;
+    background: #fff;
+    border-radius: 20px;
+    padding: 50px 40px 40px;
+    box-shadow: 0 20px 60px rgba(80, 90, 180, 0.25);
+  }
+
+  /* Logo 区域 */
+  .logo-area {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 56px;
+    height: 56px;
+  }
+  .logo-text {
+    text-align: left;
+    line-height: 1.1;
+  }
+  .logo-name {
+    font-size: 36px;
+    font-weight: 800;
+    color: #1a2b5c;
+    letter-spacing: 2px;
+    position: relative;
+    display: inline-block;
+  }
+  .logo-name .tm {
+    position: absolute;
+    top: 2px;
+    right: -14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1a2b5c;
+  }
+  .logo-tag {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 12px;
+    background: #1a2b5c;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-bottom: 28px;
+  }
+  .tab {
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    padding: 8px 2px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .tab.active {
+    color: #1a2b5c;
+    border-bottom-color: #4a5bd6;
+    font-weight: 600;
+  }
+
+  /* 输入框 */
+  .input-group {
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .input-group input {
+    width: 100%;
+    height: 50px;
+    padding: 0 18px;
+    border: 1px solid #e0e2ea;
+    border-radius: 10px;
+    font-size: 15px;
+    color: #333;
+    background: #fafbff;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .input-group input:focus {
+    border-color: #4a5bd6;
+    background: #fff;
+  }
+  .input-group input::placeholder { color: #b8bcd0; }
+
+  .eye-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #b8bcd0;
+    padding: 4px;
+  }
+  .eye-btn:hover { color: #4a5bd6; }
+
+  /* 忘记密码 */
+  .forgot {
+    text-align: left;
+    margin: 6px 0 24px;
+  }
+  .forgot a {
+    color: #4a5bd6;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .forgot a:hover { text-decoration: underline; }
+
+  /* 登录按钮 */
+  .login-btn {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(90deg, #7B8FFF, #8B95FF);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 2px;
+  }
+  .login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(123, 143, 255, 0.4);
+  }
+  .login-btn:active { transform: translateY(0); }
+
+  /* 第三方登录 */
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 30px 0 24px;
+    color: #c4c7d4;
+    font-size: 13px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #eceef4;
+  }
+  .divider span { padding: 0 16px; }
+
+  .social-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+  }
+  .social-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+    font-size: 20px;
+    color: #fff;
+    text-decoration: none;
+  }
+  .social-icon:hover { transform: scale(1.1); }
+
+  .wechat { background: #07C160; }
+  .wfl { background: #2C5282; font-size: 11px; font-weight: 700; }
+  .app3 { background: #E8503A; font-size: 18px; }
+  .app4 { background: #F59E0B; font-size: 18px; }
+
+  .more-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: #f0f1f6;
+    cursor: pointer;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .more-btn:hover { background: #e4e6ee; }
+
+  /* 短信登录面板 */
+  .sms-panel { display: none; }
+  .sms-panel.show { display: block; }
+  .pwd-panel.hide { display: none; }
+
+  .code-row {
+    display: flex;
+    gap: 10px;
+  }
+  .code-row .input-group { flex: 1; margin-bottom: 0; }
+  .send-code-btn {
+    height: 50px;
+    padding: 0 16px;
+    border: 1px solid #4a5bd6;
+    background: #fff;
+    color: #4a5bd6;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .send-code-btn:hover { background: #4a5bd6; color: #fff; }
+  .send-code-btn:disabled {
+    border-color: #ccc;
+    color: #999;
+    cursor: not-allowed;
+    background: #f5f5f5;
+  }
+
+  .toast {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <!-- 云朵装饰 -->
+  <div class="cloud cloud1"></div>
+  <div class="cloud cloud2"></div>
+  <div class="cloud cloud3"></div>
+
+  <div class="login-card">
+    <!-- Logo -->
+    <div class="logo-area">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3B5BDB"/>
+              <stop offset="100%" stop-color="#4C6EF5"/>
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r="28" fill="none" stroke="url(#lg)" stroke-width="5"/>
+          <path d="M32 14 L32 50" stroke="url(#lg)" stroke-width="7" stroke-linecap="round"/>
+          <path d="M22 26 Q32 14 42 26" stroke="url(#lg)" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M18 38 L30 50 L50 24" stroke="#74C0FC" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="logo-text">
+          <div class="logo-name">泮泮<span class="tm">®</span></div>
+          <div class="logo-tag">你的数智校园好友</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="pwd">密码登录</div>
+      <div class="tab" data-tab="sms">短信登录</div>
+    </div>
+
+    <!-- 密码登录 -->
+    <div class="pwd-panel">
+      <div class="input-group">
+        <input type="tel" id="phone" placeholder="请输入手机号" maxlength="11">
+      </div>
+      <div class="input-group">
+        <input type="password" id="password" placeholder="请输入密码">
+        <button class="eye-btn" id="eyeBtn" title="显示/隐藏密码">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
+      <div class="forgot"><a href="#">忘记密码</a></div>
+      <button class="login-btn" id="loginBtn">登 录</button>
+    </div>
+
+    <!-- 短信登录 -->
+    <div class="sms-panel">
+      <div class="input-group">
+        <input type="tel" id="smsPhone" placeholder="请输入手机号" maxlength="11">
+      </div>
+      <div class="input-group code-row">
+        <input type="text" id="smsCode" placeholder="请输入验证码" maxlength="6">
+        <button class="send-code-btn" id="sendCodeBtn">获取验证码</button>
+      </div>
+      <div style="height: 38px;"></div>
+      <button class="login-btn" id="smsLoginBtn">登 录</button>
+    </div>
+
+    <!-- 第三方登录 -->
+    <div class="divider"><span>第三方登录</span></div>
+    <div class="social-login">
+      <a href="#" class="social-icon wechat" title="微信登录">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff">
+          <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .55-.013.821-.033a6.127 6.127 0 0 1-.222-1.697c0-3.572 3.496-6.465 7.802-6.465.24 0 .478.013.713.033C16.906 4.653 13.174 2.188 8.691 2.188zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 10.436 7.17c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-3.793 0-6.866 2.527-6.866 5.645 0 3.118 3.073 5.645 6.866 5.645.657 0 1.29-.086 1.886-.243a.73.73 0 0 1 .604.082l1.62.944a.274.274 0 0 0 .14.045c.134 0 .24-.11.24-.245 0-.06-.024-.12-.04-.178l-.328-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 17.48 24 15.866 24 14.06c0-2.866-2.657-5.202-6.062-5.202zm-2.39 2.462c.535 0 .969.44.969.982a.976.976 0 0 1-.969.982.976.976 0 0 1-.969-.982c0-.542.434-.982.969-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.982.976.976 0 0 1-.969-.982c0-.542.434-.982.969-.982z"/>
+        </svg>
+      </a>
+      <a href="#" class="social-icon wfl" title="WFL">WFL</a>
+      <a href="#" class="social-icon app3" title="校园卡">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2 L2 7 l10 5 10-5-10-5z"/>
+          <path d="M2 17 l10 5 10-5"/>
+          <path d="M2 12 l10 5 10-5"/>
+        </svg>
+      </a>
+      <a href="#" class="social-icon app4" title="其他">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 8 v8 M8 12 h8"/>
+        </svg>
+      </a>
+      <button class="more-btn" title="更多">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // Tab 切换
+  const tabs = document.querySelectorAll('.tab');
+  const pwdPanel = document.querySelector('.pwd-panel');
+  const smsPanel = document.querySelector('.sms-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      if (tab.dataset.tab === 'pwd') {
+        pwdPanel.classList.remove('hide');
+        smsPanel.classList.remove('show');
+      } else {
+        pwdPanel.classList.add('hide');
+        smsPanel.classList.add('show');
+      }
+    });
+  });
+
+  // 密码显示/隐藏
+  const eyeBtn = document.getElementById('eyeBtn');
+  const passwordInput = document.getElementById('password');
+  eyeBtn.addEventListener('click', () => {
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      eyeBtn.style.color = '#4a5bd6';
+    } else {
+      passwordInput.type = 'password';
+      eyeBtn.style.color = '';
+    }
+  });
+
+  // Toast 提示
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // 手机号校验
+  function validPhone(phone) {
+    return /^1[3-9]\d{9}$/.test(phone);
+  }
+
+  // 密码登录
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const phone = document.getElementById('phone').value.trim();
+    const pwd = passwordInput.value.trim();
+    if (!validPhone(phone)) { showToast('请输入正确的手机号'); return; }
+    if (!pwd) { showToast('请输入密码'); return; }
+    showToast('登录成功，欢迎使用泮泮！');
+  });
+
+  // 获取验证码
+  const sendCodeBtn = document.getElementById('sendCodeBtn');
+  sendCodeBtn.addEventListener('click', () => {
+    const phone = document.getElementById('smsPhone').value.trim();
+    if (!validPhone(phone)) { showToast('请输入正确的手机号'); return; }
+    let count = 60;
+    sendCodeBtn.disabled = true;
+    sendCodeBtn.textContent = `${count}s 后重发`;
+    showToast('验证码已发送');
+    const timer = setInterval(() => {
+      count--;
+      sendCodeBtn.textContent = `${count}s 后重发`;
+      if (count <= 0) {
+        clearInterval(timer);
+        sendCodeBtn.disabled = false;
+        sendCodeBtn.textContent = '获取验证码';
+      }
+    }, 1000);
+  });
+
+  // 短信登录
+  document.getElementById('smsLoginBtn').addEventListener('click', () => {
+    const phone = document.getElementById('smsPhone').value.trim();
+    const code = document.getElementById('smsCode').value.trim();
+    if (!validPhone(phone)) { showToast('请输入正确的手机号'); return; }
+    if (!code || code.length < 4) { showToast('请输入验证码'); return; }
+    showToast('登录成功，欢迎使用泮泮！');
+  });
+</script>
+</body>
+</html>
